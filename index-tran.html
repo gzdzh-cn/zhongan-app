@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .container {
+            /* 关键：容器设置高对比度 */
+            filter: contrast(30);
+            background: #665959;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop {
+            background: #fdd62a;
+            border-radius: 50%;
+            position: absolute;
+            /* 关键：水滴边缘模糊 */
+            filter: blur(15px);
+            transition: transform 0.3s ease;
+        }
+
+        .fixed-drop {
+            width: 50px;
+            height: 50px;
+        }
+
+        .movable-drop {
+            width: 50px;
+            height: 50px;
+            cursor: grab;
+            /* 添加过渡效果，使恢复平滑 */
+            transition: top 0.5s ease-out;
+        }
+
+        /* 添加SVG样式 */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            /* 添加过渡效果 */
+            transition: opacity 0.3s ease;
+        }
+        
+        path {
+            fill: #fdd62a;
+            filter: blur(10px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <svg id="liquidConnector">
+            <path id="connector" d=""></path>
+        </svg>
+        <div class="drop fixed-drop" id="fixedDrop"></div>
+        <div class="drop movable-drop" id="movableDrop"></div>
+    </div>
+
+    <script>
+        let isDragging = false;
+        let currentDrop = null;
+        
+        // 初始化起始位置坐标变量
+        let startY = 0;
+
+        // 初始化位置（初始重叠状态）
+        const fixedDrop = document.getElementById('fixedDrop');
+        const movableDrop = document.getElementById('movableDrop');
+
+        const containerRect = document.querySelector('.container').getBoundingClientRect();
+        const centerX = containerRect.width / 2;
+        const centerY = containerRect.height / 2;
+
+        fixedDrop.style.left = `${centerX - fixedDrop.offsetWidth / 2}px`;
+        fixedDrop.style.top = `${centerY - fixedDrop.offsetHeight / 2}px`;
+        movableDrop.style.left = `${centerX - movableDrop.offsetWidth / 2}px`;
+        movableDrop.style.top = `${centerY - movableDrop.offsetHeight / 2}px`;
+        
+        // 记录起始位置
+        startY = centerY - movableDrop.offsetHeight / 2;
+
+        // 拖拽逻辑
+        movableDrop.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            currentDrop = e.target;
+            currentDrop.style.cursor = 'grabbing';
+            // 取消过渡效果，使拖动更平滑
+            currentDrop.style.transition = 'none';
+        });
+
+        // 添加贝塞尔曲线连接逻辑
+        const svg = document.getElementById('liquidConnector');
+        const connectorPath = document.getElementById('connector');
+        
+        function updateLiquidConnector() {
+            const fixed = fixedDrop.getBoundingClientRect();
+            const movable = movableDrop.getBoundingClientRect();
+            
+            // 计算两个圆的中心点
+            const fixedX = fixed.left + fixed.width/2 - containerRect.left;
+            const fixedY = fixed.top + fixed.height/2 - containerRect.top;
+            const movableX = movable.left + movable.width/2 - containerRect.left;
+            const movableY = movable.top + movable.height/2 - containerRect.top;
+            
+            // 计算距离
+            const dx = movableX - fixedX;
+            const dy = movableY - fixedY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // 计算两圆的半径
+            const r1 = fixed.width / 2;
+            const r2 = movable.width / 2;
+            
+            // 修改连接宽度计算方式，确保远距离时仍有最小宽度
+            const maxWidth = Math.min(r1, r2) * 0.8;
+            const minWidth = Math.min(r1, r2) * 0.15; // 增加最小宽度
+            
+            // 使用非线性函数计算宽度衰减
+            const widthFactor = 1 / (1 + distance/200);
+            const width = Math.max(minWidth, maxWidth * widthFactor);
+            
+            // 计算垂直于连接线的向量
+            const nx = -dy / distance;
+            const ny = dx / distance;
+            
+            // 定义四个角点
+            const p1x = fixedX + nx * width;
+            const p1y = fixedY + ny * width;
+            const p2x = fixedX - nx * width;
+            const p2y = fixedY - ny * width;
+            const p3x = movableX - nx * width;
+            const p3y = movableY - ny * width;
+            const p4x = movableX + nx * width;
+            const p4y = movableY + ny * width;
+            
+            // 调整控制点计算方式，适应长距离
+            const controlRatio = Math.min(0.5, 50 / distance);
+            
+            // 路径数据：两条贝塞尔曲线连接两圆
+            const path = `
+                M ${p1x},${p1y}
+                C ${p1x + dx*controlRatio},${p1y + dy*controlRatio} 
+                  ${p4x - dx*controlRatio},${p4y - dy*controlRatio} 
+                  ${p4x},${p4y}
+                L ${p3x},${p3y}
+                C ${p3x - dx*controlRatio},${p3y - dy*controlRatio} 
+                  ${p2x + dx*controlRatio},${p2y + dy*controlRatio} 
+                  ${p2x},${p2y}
+                Z
+            `;
+            
+            connectorPath.setAttribute('d', path);
+        }
+        
+        // 修改鼠标移动事件处理
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const rect = currentDrop.getBoundingClientRect();
+            const containerRect = document.querySelector('.container').getBoundingClientRect();
+            
+            // 计算与起始位置的距离
+            const currentY = e.clientY - rect.height / 2;
+            const deltaY = Math.abs(currentY - startY);
+            
+            // 限制最大移动距离为300px
+            if (deltaY > 100) {
+                const direction = currentY > startY ? 1 : -1;
+                const limitedY = startY + 100 * direction;
+                currentDrop.style.top = `${limitedY}px`;
+            } else {
+                const newY = Math.min(
+                    Math.max(currentY, containerRect.top),
+                    containerRect.bottom - rect.height
+                );
+                currentDrop.style.top = `${newY}px`;
+            }
+            
+            currentDrop.style.left = `${centerX - rect.width / 2}px`;
+            
+            // 计算固定圆形的新尺寸，根据移动距离缩小到原来的一半
+            const distanceRatio = Math.min(deltaY / 100, 0.5);
+            const newSize = 50* (1 - distanceRatio);
+            
+            // 更新固定圆形大小，同时保持圆心位置不变
+            const oldSize = parseFloat(fixedDrop.style.width) || 50;
+            const sizeDiff = oldSize - newSize;
+            
+            fixedDrop.style.width = `${newSize}px`;
+            fixedDrop.style.height = `${newSize}px`;
+            
+            // 调整位置以保持圆心不变
+            const currentLeft = parseFloat(fixedDrop.style.left);
+            const currentTop = parseFloat(fixedDrop.style.top);
+            fixedDrop.style.left = `${currentLeft + sizeDiff/2}px`;
+            fixedDrop.style.top = `${currentTop + sizeDiff/2}px`;
+            
+            // 更新液体连接器
+            updateLiquidConnector();
+        });
+        
+        // 初始化连接器
+        updateLiquidConnector();
+        
+        // 修改鼠标释放事件
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            if (currentDrop) {
+                currentDrop.style.cursor = 'grab';
+                // 恢复过渡效果
+                currentDrop.style.transition = 'top 0.5s ease-out';
+                
+                // 添加过渡结束的事件监听器
+                const onTransitionEnd = () => {
+                    // 当第一个圆形过渡完成后，恢复固定圆形的大小
+                    fixedDrop.style.transition = 'width 0.3s ease-out, height 0.3s ease-out, left 0.3s ease-out, top 0.3s ease-out';
+                    fixedDrop.style.width = '50px';
+                    fixedDrop.style.height = '50px';
+                    // 恢复固定圆形的位置
+                    fixedDrop.style.left = `${centerX - 50/2}px`;
+                    fixedDrop.style.top = `${centerY - 50/2}px`;
+                    
+                    // 更新连接器
+                    updateLiquidConnector();
+                    
+                    // 移除事件监听器
+                    currentDrop.removeEventListener('transitionend', onTransitionEnd);
+                };
+                
+                // 添加过渡结束监听器
+                currentDrop.addEventListener('transitionend', onTransitionEnd);
+                
+                // 恢复到起始位置
+                currentDrop.style.top = `${startY}px`;
+                
+                // 使用requestAnimationFrame持续更新连接器，直到过渡结束
+                function updateDuringTransition() {
+                    // 更新连接器形状
+                    updateLiquidConnector();
+                    
+                    // 检查是否仍在过渡中
+                    const currentTop = parseFloat(window.getComputedStyle(currentDrop).top);
+                    const fixedWidth = parseFloat(window.getComputedStyle(fixedDrop).width);
+                    const isTransitioning = Math.abs(currentTop - startY) > 0.5 || fixedWidth < 50;
+                    
+                    if (isTransitioning) {
+                        requestAnimationFrame(updateDuringTransition);
+                    }
+                }
+                
+                // 开始过渡动画更新
+                requestAnimationFrame(updateDuringTransition);
+            }
+        });
+
+        // 添加固定圆形的过渡样式
+        fixedDrop.style.transition = 'none';
+
+        // 添加触摸事件监听器
+        movableDrop.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            currentDrop = e.target;
+            currentDrop.style.cursor = 'grabbing';
+            currentDrop.style.transition = 'none';
+            e.preventDefault(); // 阻止默认触摸行为
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const rect = currentDrop.getBoundingClientRect();
+            const containerRect = document.querySelector('.container').getBoundingClientRect();
+            
+            const currentY = touch.clientY - rect.height / 2;
+            const deltaY = Math.abs(currentY - startY);
+            
+            if (deltaY > 100) {
+                const direction = currentY > startY ? 1 : -1;
+                const limitedY = startY + 100 * direction;
+                currentDrop.style.top = `${limitedY}px`;
+            } else {
+                const newY = Math.min(
+                    Math.max(currentY, containerRect.top),
+                    containerRect.bottom - rect.height
+                );
+                currentDrop.style.top = `${newY}px`;
+            }
+            
+            currentDrop.style.left = `${centerX - rect.width / 2}px`;
+            
+            const distanceRatio = Math.min(deltaY / 100, 0.5);
+            const newSize = 50 * (1 - distanceRatio);
+            
+            const oldSize = parseFloat(fixedDrop.style.width) || 50;
+            const sizeDiff = oldSize - newSize;
+            
+            fixedDrop.style.width = `${newSize}px`;
+            fixedDrop.style.height = `${newSize}px`;
+            
+            const currentLeft = parseFloat(fixedDrop.style.left);
+            const currentTop = parseFloat(fixedDrop.style.top);
+            fixedDrop.style.left = `${currentLeft + sizeDiff/2}px`;
+            fixedDrop.style.top = `${currentTop + sizeDiff/2}px`;
+            
+            updateLiquidConnector();
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+            if (currentDrop) {
+                currentDrop.style.cursor = 'grab';
+                currentDrop.style.transition = 'top 0.5s ease-out';
+                
+                const onTransitionEnd = () => {
+                    fixedDrop.style.transition = 'width 0.3s ease-out, height 0.3s ease-out, left 0.3s ease-out, top 0.3s ease-out';
+                    fixedDrop.style.width = '50px';
+                    fixedDrop.style.height = '50px';
+                    fixedDrop.style.left = `${centerX - 50/2}px`;
+                    fixedDrop.style.top = `${centerY - 50/2}px`;
+                    
+                    updateLiquidConnector();
+                    
+                    currentDrop.removeEventListener('transitionend', onTransitionEnd);
+                };
+                
+                currentDrop.addEventListener('transitionend', onTransitionEnd);
+                
+                currentDrop.style.top = `${startY}px`;
+                
+                function updateDuringTransition() {
+                    updateLiquidConnector();
+                    
+                    const currentTop = parseFloat(window.getComputedStyle(currentDrop).top);
+                    const fixedWidth = parseFloat(window.getComputedStyle(fixedDrop).width);
+                    const isTransitioning = Math.abs(currentTop - startY) > 0.5 || fixedWidth < 50;
+                    
+                    if (isTransitioning) {
+                        requestAnimationFrame(updateDuringTransition);
+                    }
+                }
+                
+                requestAnimationFrame(updateDuringTransition);
+            }
+        });
+    </script>
+</body>
+
+</html>

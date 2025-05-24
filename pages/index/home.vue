@@ -7,7 +7,7 @@
 			@touchmove="handleTouchMove"
 			@touchend="handleTouchEnd"
 		>
-			<view class="section1 section-one"  >
+			<view class="section1 section-one">
 				<!-- logo -->
 				<view class="head">
 					<view class="nav-item-l">
@@ -113,6 +113,7 @@
 			</view>
 
 			<view class="news section-two" :style="sectionStyle">
+				<view class="background-layer" :style="backgroundStyle"></view>
 				<view class="new-contain">
 					<span class="t"> 动态 </span>
 
@@ -195,7 +196,7 @@
 				</view>
 			</view>
 
-			<view class="tran">
+			<view class="tran" :style="tranStyle">
 				<view class="box">
 					<text>转出</text>
 					<view class="tran-btn">
@@ -233,58 +234,126 @@ import { dzhStore } from "/@/dzh";
 
 const logoSrc = ref("/static/3156/logo.png");
 const { setting } = dzhStore();
- 
 
 const viewportHeight = ref(uni.getSystemInfoSync().windowHeight);
 
 const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
 const isAnimating = ref(false);
+const THRESHOLD = 30;
+const isAtTop = ref(false); // 是否在顶部位置
 
 const TOP_POSITION = -viewportHeight.value * 0.56;
 const INITIAL_POSITION = 0;
 
+// 计算背景图片透明度
+const backgroundOpacity = computed(() => {
+	const progress = Math.abs(currentOffset.value) / 20; // 使用20px作为渐变范围
+	return Math.min(1, Math.max(0, progress));
+});
+
 const sectionStyle = computed(() => ({
-  transform: `translateY(${currentOffset.value}px)`,
-  transition: isAnimating.value ? "transform 0.3s ease" : "none",
-  willChange: "transform",
+	transform: `translateY(${currentOffset.value}px)`,
+	transition: isAnimating.value ? "transform 0.3s ease" : "none",
+	willChange: "transform",
+}));
+
+// 背景图片样式
+const backgroundStyle = computed(() => ({
+	opacity: 1,
+	transition: isAnimating.value ? "all 0.3s ease" : "none",
+	'--slice-opacity': 1 - backgroundOpacity.value,
+	'--none-slice-opacity': backgroundOpacity.value,
 }));
 
 const handleTouchStart = (e: TouchEvent) => {
-  if (isAnimating.value) return;
-  touchStartY.value = e.touches[0].clientY;
-  isAnimating.value = false;
+	if (isAnimating.value) return;
+	touchStartY.value = e.touches[0].clientY;
+	isAnimating.value = false;
 };
 
 const handleTouchMove = (e: TouchEvent) => {
-  const deltaY = e.touches[0].clientY - touchStartY.value;
-  const nextOffset = currentOffset.value + deltaY;
+	if (isAnimating.value) return;
+	
+	const deltaY = e.touches[0].clientY - touchStartY.value;
+	const nextOffset = currentOffset.value + deltaY;
 
-  // 限制滑动范围（不能往下拖动，也不能超过顶部限制）
-  if (nextOffset >= INITIAL_POSITION) {
-    currentOffset.value = INITIAL_POSITION;
-  } else if (nextOffset <= TOP_POSITION) {
-    currentOffset.value = TOP_POSITION;
-  } else {
-    currentOffset.value = nextOffset;
-  }
+	// 限制滑动范围
+	if (nextOffset >= INITIAL_POSITION) {
+		currentOffset.value = INITIAL_POSITION;
+	} else if (nextOffset <= TOP_POSITION) {
+		currentOffset.value = TOP_POSITION;
+	} else {
+		currentOffset.value = nextOffset;
+	}
 
-  // 更新初始点，便于连续滑动
-  touchStartY.value = e.touches[0].clientY;
+	// 如果移动距离超过阈值，自动滑动到顶部
+	if (Math.abs(deltaY) > THRESHOLD && deltaY < 0) {
+		isAnimating.value = true;
+		currentOffset.value = TOP_POSITION;
+		isAtTop.value = true;
+		setTimeout(() => {
+			isAnimating.value = false;
+		}, 300);
+	}
+
+	// 如果在顶部位置，检测下滑
+	if (isAtTop.value && deltaY > 0) {
+		if (deltaY > THRESHOLD) {
+			isAnimating.value = true;
+			currentOffset.value = INITIAL_POSITION;
+			isAtTop.value = false;
+			setTimeout(() => {
+				isAnimating.value = false;
+			}, 300);
+		}
+	}
+
+	// 更新初始点，便于连续滑动
+	touchStartY.value = e.touches[0].clientY;
 };
 
 const handleTouchEnd = () => {
-  isAnimating.value = true;
+	if (isAnimating.value) return;
+	
+	isAnimating.value = true;
+	const deltaY = currentOffset.value - INITIAL_POSITION;
 
-  const middle = (TOP_POSITION + INITIAL_POSITION) / 2;
-  currentOffset.value =
-    currentOffset.value < middle ? TOP_POSITION : INITIAL_POSITION;
+	// 如果在顶部位置，检测下滑
+	if (isAtTop.value && deltaY > 0) {
+		if (deltaY > THRESHOLD) {
+			currentOffset.value = INITIAL_POSITION;
+			isAtTop.value = false;
+		} else {
+			currentOffset.value = TOP_POSITION;
+		}
+	} else {
+		// 如果移动距离小于阈值，恢复到初始位置
+		if (Math.abs(deltaY) < THRESHOLD) {
+			currentOffset.value = INITIAL_POSITION;
+			isAtTop.value = false;
+		} else {
+			// 如果移动距离超过阈值，滑动到顶部
+			currentOffset.value = TOP_POSITION;
+			isAtTop.value = true;
+		}
+	}
 
-  // 动画结束后移除 transition
-  setTimeout(() => {
-    isAnimating.value = false;
-  }, 300);
+	// 动画结束后移除 transition
+	setTimeout(() => {
+		isAnimating.value = false;
+	}, 300);
 };
+
+const tranOpacity = computed(() => {
+	const progress = Math.abs(currentOffset.value) / 30; // 使用30px作为渐变范围
+	return Math.max(0, 1 - progress);
+});
+
+const tranStyle = computed(() => ({
+	opacity: tranOpacity.value,
+	transition: isAnimating.value ? 'opacity 0.3s ease' : 'none',
+}));
 </script>
 
 <style scoped>
@@ -328,7 +397,6 @@ const handleTouchEnd = () => {
 	top: 760rpx;
 	left: 0;
 	z-index: 1;
- 
 }
 /* 动画类 */
 .slide-up {
@@ -544,12 +612,41 @@ const handleTouchEnd = () => {
 
 .news {
 	width: 100%;
-	// height: 100vh;
 	padding-top: 220rpx;
-	background-image: url(/static/3156/img/slice.png);
-	background-size: 100%;
-	background-repeat: no-repeat;
+	position: relative;
+	.background-layer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 0;
+		pointer-events: none;
+		&::before,
+		&::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-size: 100% 100%;
+			background-repeat: no-repeat;
+			background-position: center center;
+			transition: opacity 0.3s ease;
+		}
+		&::before {
+			background-image: url(/static/3156/img/slice.png);
+			opacity: var(--slice-opacity);
+		}
+		&::after {
+			background-image: url(/static/3156/img/none-slice.png);
+			opacity: var(--none-slice-opacity);
+		}
+	}
 	.new-contain {
+		position: relative;
+		z-index: 1;
 		padding: 33rpx 26rpx;
 		.t {
 			font-weight: bold;
@@ -635,18 +732,21 @@ const handleTouchEnd = () => {
 	right: 50rpx;
 	top: 780rpx;
 	z-index: 1;
+	will-change: opacity;
+	
 	.box {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		gap: 10rpx;
-
+		
 		.tran-btn {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+			
 			.btn {
 				width: 120rpx;
 				height: 120rpx;
@@ -656,11 +756,13 @@ const handleTouchEnd = () => {
 				flex-direction: row;
 				justify-content: center;
 				align-items: center;
+				
 				.new-img {
 					width: 60rpx;
 					height: 60rpx;
 				}
 			}
+			
 			.arrow-up {
 				height: 15rpx;
 				display: flex;
@@ -668,6 +770,7 @@ const handleTouchEnd = () => {
 				justify-content: center;
 				align-items: center;
 			}
+			
 			.arrow-down {
 				height: 15rpx;
 				display: flex;
@@ -676,7 +779,7 @@ const handleTouchEnd = () => {
 				align-items: center;
 			}
 		}
-
+		
 		span {
 			font-size: 24rpx;
 			font-weight: bold;
