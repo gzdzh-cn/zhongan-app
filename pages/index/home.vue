@@ -211,6 +211,7 @@
 							size="15"
 							color="#c5c5cd"
 							class="arrow-up"
+							:style="tranTextStyle"
 						></uni-icons>
 						<view class="btn">
 							<image src="/static/3156/img/tran-img.png" mode="aspectFit" class="new-img" />
@@ -221,6 +222,7 @@
 							size="15"
 							color="#c5c5cd"
 							class="arrow-down"
+							:style="tranTextStyle"
 						></uni-icons>
 					</view>
 					<text class="tran-text" :style="tranTextStyle">转入</text>
