@@ -198,8 +198,13 @@
 
 			<view class="tran" :style="tranStyle">
 				<view class="box">
-					<text>转出</text>
-					<view class="tran-btn">
+					<text class="tran-text" :style="tranTextStyle">转出</text>
+					<view class="tran-btn" 
+						:style="tranBtnStyle"
+						@touchstart.stop.prevent="handleTranTouchStart"
+						@touchmove.stop.prevent="handleTranTouchMove"
+						@touchend.stop.prevent="handleTranTouchEnd"
+					>
 						<uni-icons
 							custom-prefix="iconfont-3156"
 							type="icon-xiangshangjiantoukuan-xianxing"
@@ -218,7 +223,7 @@
 							class="arrow-down"
 						></uni-icons>
 					</view>
-					<text>转入</text>
+					<text class="tran-text" :style="tranTextStyle">转入</text>
 				</view>
 			</view>
 		</view>
@@ -354,6 +359,54 @@ const tranStyle = computed(() => ({
 	opacity: tranOpacity.value,
 	transition: isAnimating.value ? 'opacity 0.3s ease' : 'none',
 }));
+
+// tran 按钮移动相关状态
+const isTranDragging = ref(false);
+const tranStartY = ref(0);
+const tranCurrentY = ref(0);
+const tranBtnStyle = computed(() => ({
+	transform: `translateY(${tranCurrentY.value}px)`,
+	transition: isTranDragging.value ? 'none' : 'transform 0.3s ease'
+}));
+
+// tran 文本透明度计算
+const tranTextOpacity = computed(() => {
+	const progress = Math.abs(tranCurrentY.value) / 30;
+	return Math.max(0, 1 - progress);
+});
+
+const tranTextStyle = computed(() => ({
+	opacity: tranTextOpacity.value,
+	transition: 'opacity 0.3s ease',
+}));
+
+// tran 按钮触摸事件处理
+const handleTranTouchStart = (e: TouchEvent) => {
+	e.preventDefault();
+	e.stopPropagation();
+	isTranDragging.value = true;
+	tranStartY.value = e.touches[0].clientY;
+	tranCurrentY.value = 0;
+};
+
+const handleTranTouchMove = (e: TouchEvent) => {
+	e.preventDefault();
+	e.stopPropagation();
+	if (!isTranDragging.value) return;
+	
+	const deltaY = e.touches[0].clientY - tranStartY.value;
+	const limitedDeltaY = Math.max(-100, Math.min(100, deltaY));
+	tranCurrentY.value = limitedDeltaY;
+};
+
+const handleTranTouchEnd = (e: TouchEvent) => {
+	e.preventDefault();
+	e.stopPropagation();
+	if (!isTranDragging.value) return;
+	
+	isTranDragging.value = false;
+	tranCurrentY.value = 0;
+};
 </script>
 
 <style scoped>
@@ -730,7 +783,7 @@ const tranStyle = computed(() => ({
 .tran {
 	position: absolute;
 	right: 50rpx;
-	top: 780rpx;
+	top: 820rpx;
 	z-index: 1;
 	will-change: opacity;
 	
@@ -739,13 +792,25 @@ const tranStyle = computed(() => ({
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		gap: 10rpx;
+		gap: 3rpx;
+		
+		.tran-text {
+			font-size: 24rpx;
+			font-weight: bold;
+			will-change: opacity;
+		}
 		
 		.tran-btn {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+			position: relative;
+			// height: 160rpx;
+			touch-action: none;
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			user-select: none;
 			
 			.btn {
 				width: 120rpx;
@@ -778,11 +843,6 @@ const tranStyle = computed(() => ({
 				justify-content: center;
 				align-items: center;
 			}
-		}
-		
-		span {
-			font-size: 24rpx;
-			font-weight: bold;
 		}
 	}
 }
