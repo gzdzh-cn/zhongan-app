@@ -199,31 +199,37 @@
 			<view class="tran" :style="tranStyle">
 				<view class="box">
 					<text class="tran-text" :style="tranTextStyle">转出</text>
-					<view class="tran-btn" 
-						:style="tranBtnStyle"
-						@touchstart.stop.prevent="handleTranTouchStart"
-						@touchmove.stop.prevent="handleTranTouchMove"
-						@touchend.stop.prevent="handleTranTouchEnd"
-					>
-						<uni-icons
-							custom-prefix="iconfont-3156"
-							type="icon-xiangshangjiantoukuan-xianxing"
-							size="15"
-							color="#c5c5cd"
-							class="arrow-up"
-							:style="tranTextStyle"
-						></uni-icons>
-						<view class="btn">
-							<image src="/static/3156/img/tran-img.png" mode="aspectFit" class="new-img" />
+					<view class="tran-btn-container">
+						<view class="fixed-circle" :class="{ 'show': showFixedCircle }"></view>
+						<svg class="liquid-connector" :class="{ 'show': showFixedCircle }" width="120" height="300" viewBox="0 0 120 300">
+							<path :d="liquidPath" fill="#f8d653" />
+						</svg>
+						<view class="tran-btn" 
+							:style="tranBtnStyle"
+							@touchstart.stop.prevent="handleTranTouchStart"
+							@touchmove.stop.prevent="handleTranTouchMove"
+							@touchend.stop.prevent="handleTranTouchEnd"
+						>
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-xiangshangjiantoukuan-xianxing"
+								size="15"
+								color="#c5c5cd"
+								class="arrow-up"
+								:style="tranTextStyle"
+							></uni-icons>
+							<view class="btn">
+								<image src="/static/3156/img/tran-img.png" mode="aspectFit" class="new-img" />
+							</view>
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-xiangxiajiantoukuan-xianxing"
+								size="15"
+								color="#c5c5cd"
+								class="arrow-down"
+								:style="tranTextStyle"
+							></uni-icons>
 						</view>
-						<uni-icons
-							custom-prefix="iconfont-3156"
-							type="icon-xiangxiajiantoukuan-xianxing"
-							size="15"
-							color="#c5c5cd"
-							class="arrow-down"
-							:style="tranTextStyle"
-						></uni-icons>
 					</view>
 					<text class="tran-text" :style="tranTextStyle">转入</text>
 				</view>
@@ -366,10 +372,87 @@ const tranStyle = computed(() => ({
 const isTranDragging = ref(false);
 const tranStartY = ref(0);
 const tranCurrentY = ref(0);
+const showFixedCircle = ref(false);
+const liquidPath = ref('');
+
 const tranBtnStyle = computed(() => ({
 	transform: `translateY(${tranCurrentY.value}px)`,
 	transition: isTranDragging.value ? 'none' : 'transform 0.3s ease'
 }));
+
+// 添加液体路径计算
+const calculateLiquidPath = (startY: number, endY: number, distance: number, isUpward: boolean) => {
+	const centerX = 60;
+	const fixedRadius = 25;
+	const btnRadius = 60;
+	const maxWidth = btnRadius * 0.5;
+	const minWidth = 10;
+	const widthFactor = Math.max(0, 1 - distance / 200);
+	const liquidWidth = minWidth + (maxWidth - minWidth) * widthFactor;
+	const elasticFactor = Math.sin(distance * 0.03) * Math.min(6, distance * 0.1);
+	const maxOffset = 20;
+	const offsetFactor = Math.max(0, 1 - distance / 250);
+	const controlOffset = maxOffset * offsetFactor;
+	// 以startY为基准，所有控制点都用 (endY - startY) 的比例
+	return `
+		M ${centerX - fixedRadius} ${startY}
+		C ${centerX - fixedRadius} ${startY + controlOffset},
+		  ${centerX - liquidWidth - elasticFactor} ${startY + (endY - startY) * 0.3},
+		  ${centerX - liquidWidth + elasticFactor} ${startY + (endY - startY) * 0.5}
+		C ${centerX - liquidWidth * 0.8} ${startY + (endY - startY) * 0.7},
+		  ${centerX - btnRadius} ${endY - controlOffset},
+		  ${centerX - btnRadius} ${endY}
+		A ${btnRadius} ${btnRadius} 0 1 0 ${centerX + btnRadius} ${endY}
+		C ${centerX + btnRadius} ${endY - controlOffset},
+		  ${centerX + liquidWidth * 0.8} ${startY + (endY - startY) * 0.7},
+		  ${centerX + liquidWidth - elasticFactor} ${startY + (endY - startY) * 0.5}
+		C ${centerX + liquidWidth + elasticFactor} ${startY + (endY - startY) * 0.3},
+		  ${centerX + fixedRadius} ${startY + controlOffset},
+		  ${centerX + fixedRadius} ${startY}
+		A ${fixedRadius} ${fixedRadius} 0 1 0 ${centerX - fixedRadius} ${startY}
+	`;
+};
+
+const handleTranTouchStart = (e: TouchEvent) => {
+	e.preventDefault();
+	e.stopPropagation();
+	isTranDragging.value = true;
+	tranStartY.value = e.touches[0].clientY;
+	tranCurrentY.value = 0;
+	showFixedCircle.value = false;
+	liquidPath.value = calculateLiquidPath(150, 150, 0, true);
+};
+
+const handleTranTouchMove = (e: TouchEvent) => {
+	e.preventDefault();
+	e.stopPropagation();
+	if (!isTranDragging.value) return;
+	
+	const deltaY = e.touches[0].clientY - tranStartY.value;
+	const limitedDeltaY = Math.max(-150, Math.min(150, deltaY));
+	tranCurrentY.value = limitedDeltaY;
+	
+	// 计算液体路径
+	const distance = Math.abs(limitedDeltaY);
+	const startY = 150; // 固定圆的Y坐标
+	const endY = startY + limitedDeltaY;
+	const isUpward = limitedDeltaY < 0;
+	
+	// 无论上滑还是下滑，都显示液体效果和固定圆点
+	showFixedCircle.value = distance > 0;
+	liquidPath.value = calculateLiquidPath(startY, endY, distance, isUpward);
+};
+
+const handleTranTouchEnd = (e: TouchEvent) => {
+	e.preventDefault();
+	e.stopPropagation();
+	if (!isTranDragging.value) return;
+	
+	isTranDragging.value = false;
+	tranCurrentY.value = 0;
+	showFixedCircle.value = false;
+	liquidPath.value = '';
+};
 
 // tran 文本透明度计算
 const tranTextOpacity = computed(() => {
@@ -381,34 +464,6 @@ const tranTextStyle = computed(() => ({
 	opacity: tranTextOpacity.value,
 	transition: 'opacity 0.3s ease',
 }));
-
-// tran 按钮触摸事件处理
-const handleTranTouchStart = (e: TouchEvent) => {
-	e.preventDefault();
-	e.stopPropagation();
-	isTranDragging.value = true;
-	tranStartY.value = e.touches[0].clientY;
-	tranCurrentY.value = 0;
-};
-
-const handleTranTouchMove = (e: TouchEvent) => {
-	e.preventDefault();
-	e.stopPropagation();
-	if (!isTranDragging.value) return;
-	
-	const deltaY = e.touches[0].clientY - tranStartY.value;
-	const limitedDeltaY = Math.max(-100, Math.min(100, deltaY));
-	tranCurrentY.value = limitedDeltaY;
-};
-
-const handleTranTouchEnd = (e: TouchEvent) => {
-	e.preventDefault();
-	e.stopPropagation();
-	if (!isTranDragging.value) return;
-	
-	isTranDragging.value = false;
-	tranCurrentY.value = 0;
-};
 </script>
 
 <style scoped>
@@ -802,50 +857,99 @@ const handleTranTouchEnd = (e: TouchEvent) => {
 			will-change: opacity;
 		}
 		
-		.tran-btn {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
+		.tran-btn-container {
 			position: relative;
-			// height: 160rpx;
-			touch-action: none;
-			-webkit-touch-callout: none;
-			-webkit-user-select: none;
-			user-select: none;
+			height: 160rpx;
+			width: 120rpx;
 			
-			.btn {
-				width: 120rpx;
-				height: 120rpx;
-				border-radius: 50%;
+			.fixed-circle {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: 50rpx;
+				height: 50rpx;
 				background-color: #f8d653;
-				display: flex;
-				flex-direction: row;
-				justify-content: center;
-				align-items: center;
+				border-radius: 50%;
+				opacity: 0;
+				transition: opacity 0.2s ease;
+				z-index: 1;
+				box-shadow: 0 0 8rpx rgba(248, 214, 83, 0.4);
 				
-				.new-img {
-					width: 60rpx;
-					height: 60rpx;
+				&.show {
+					opacity: 1;
 				}
 			}
 			
-			.arrow-up {
-				height: 15rpx;
-				display: flex;
-				flex-direction: row;
-				justify-content: center;
-				align-items: center;
+			.liquid-connector {
+				position: absolute;
+				top: -150rpx;
+				left: 0;
+				width: 120rpx;
+				height: 460rpx;
+				pointer-events: none;
+				opacity: 0;
+				transition: opacity 0.2s ease;
+				z-index: 0;
+				
+				&.show {
+					opacity: 1;
+				}
+				
+				path {
+					transition: d 0.1s ease-out;
+					filter: drop-shadow(0 0 4px rgba(248, 214, 83, 0.3));
+					fill: #f8d653;
+				}
 			}
 			
-			.arrow-down {
-				height: 15rpx;
+			.tran-btn {
+				position: relative;
 				display: flex;
-				flex-direction: row;
+				flex-direction: column;
 				justify-content: center;
 				align-items: center;
+				height: 100%;
+				width: 100%;
+				z-index: 2;
+				
+				.btn {
+					width: 120rpx; // 恢复原始大小
+					height: 120rpx; // 恢复原始大小
+					border-radius: 50%;
+					background-color: #f8d653;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					box-shadow: 0 0 10rpx rgba(248, 214, 83, 0.3);
+					
+					.new-img {
+						width: 60rpx; // 恢复原始大小
+						height: 60rpx; // 恢复原始大小
+					}
+				}
+				
+				.arrow-up,
+				.arrow-down {
+					height: 15rpx;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					margin: 5rpx 0;
+				}
 			}
 		}
 	}
 }
+
+// 添加过渡动画
+.tran-btn {
+	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	will-change: transform;
+	
+	&:active {
+		transform: scale(0.98);
+	}
+}
 </style>
+
