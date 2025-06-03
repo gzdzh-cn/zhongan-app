@@ -1,12 +1,7 @@
 <template>
 	<cl-page backgroundColor="#f5f5fc">
-		<view
-			class="main"
-			ref="container"
-			@touchstart="handleTouchStart"
-			@touchmove="handleTouchMove"
-			@touchend="handleTouchEnd"
-		>
+		<view class="main" ref="container" @touchstart="handleTouchStart" @touchmove="handleTouchMove"
+			@touchend="handleTouchEnd">
 			<view class="section1 section-one">
 				<!-- logo -->
 				<view class="head">
@@ -16,18 +11,9 @@
 					</view>
 
 					<view class="nav-item-r">
-						<uni-icons
-							custom-prefix="iconfont-3156"
-							type="icon-kefu"
-							size="30"
-							class="kf"
-						></uni-icons>
-						<uni-icons
-							custom-prefix="iconfont-3156"
-							type="icon-erweima"
-							size="26"
-							class="qrcode"
-						></uni-icons>
+						<uni-icons custom-prefix="iconfont-3156" type="icon-kefu" size="30" class="kf"></uni-icons>
+						<uni-icons custom-prefix="iconfont-3156" type="icon-erweima" size="26"
+							class="qrcode"></uni-icons>
 					</view>
 				</view>
 
@@ -35,7 +21,7 @@
 				<view class="hd">
 					<view class="card left">
 						<view class="card-t">
-							<text class="t"> 总结余 (HKD等值)</text>
+							<text class="t"> 总结余 (HKD等值) -- {{ state.screenWidth }}</text>
 						</view>
 						<view class="card-t">
 							<text class="t numFont money">106<text class="numFont money-mini">.00</text></text>
@@ -60,11 +46,7 @@
 						</view>
 						<view class="dan">
 							<image src="/static/3156//img/dan1.png" mode="aspectFit" class="dan-img1" />
-							<image
-								src="/static/3156//img/dan2.png"
-								mode="aspectFit"
-								class="dan-img2 rotating-image"
-							/>
+							<image src="/static/3156//img/dan2.png" mode="aspectFit" class="dan-img2 rotating-image" />
 						</view>
 					</view>
 				</view>
@@ -196,57 +178,32 @@
 				</view>
 			</view>
 
-			<view
-				class="tran container"
-				:class="[{ active: state.isDragging, completed: state.completed }]"
-				:style="tranStyle"
-			>
-				<view
-					v-show="state.isDragging"
-					class="main-btn origin-point"
-					:style="originPointStyle"
-				></view>
+			<view class="tran container" :class="[{ active: state.isDragging, completed: state.completed }]"
+				:style="tranStyle">
+				<view v-show="state.isDragging" class="main-btn origin-point" :style="originPointStyle"></view>
 				<view v-show="state.isDragging" class="connection-line" :style="connectionStyle">
 					<image :src="connectSvgIcon" mode="fill"></image>
 				</view>
-				<view
-					class="main-btn"
-					:style="mainButtonStyle"
-					@touchstart.stop.prevent="onTouchStart"
-					@touchmove.stop.prevent="onTouchMove"
-					@touchend.stop.prevent="onTouchEnd"
-				>
+				<view class="main-btn" :style="mainButtonStyle" @touchstart.stop.prevent="onTouchStart"
+					@touchmove.stop.prevent="onTouchMove" @touchend.stop.prevent="onTouchEnd">
 					<div v-show="!state.completed" class="icon">
 						<view class="tran-text-wrapper tran-out" :style="tranTextWrapperStyle">
 							<text class="tran-text" :style="tranTextStyle">转出</text>
-							<uni-icons
-								custom-prefix="iconfont-3156"
-								type="icon-xiangshangjiantoukuan-xianxing"
-								size="15"
-								color="#c5c5cd"
-								class="arrow-up"
-								:style="tranTextStyle"
-							></uni-icons>
+							<uni-icons custom-prefix="iconfont-3156" type="icon-xiangshangjiantoukuan-xianxing"
+								size="15" color="#c5c5cd" class="arrow-up" :style="tranTextStyle"></uni-icons>
 						</view>
 						<view class="tran-guid">
 							<image :src="tranGuidSvgIcon" mode="fill"></image>
 						</view>
 						<view class="tran-text-wrapper tran-in" :style="tranTextWrapperStyle">
-							<uni-icons
-								custom-prefix="iconfont-3156"
-								type="icon-xiangxiajiantoukuan-xianxing"
-								size="15"
-								color="#c5c5cd"
-								class="arrow-down"
-								:style="tranTextStyle"
-							></uni-icons>
+							<uni-icons custom-prefix="iconfont-3156" type="icon-xiangxiajiantoukuan-xianxing" size="15"
+								color="#c5c5cd" class="arrow-down" :style="tranTextStyle"></uni-icons>
 							<text class="tran-text" :style="tranTextStyle">转入</text>
 						</view>
 					</div>
 				</view>
-			</view>
+			 </view>
 		</view>
-
 		<tabbar />
 	</cl-page>
 </template>
@@ -287,8 +244,8 @@ const sectionStyle = computed(() => ({
 const backgroundStyle = computed(() => ({
 	opacity: 1,
 	transition: isAnimating.value ? "all 0.3s ease" : "none",
-	"--slice-opacity": 1 - backgroundOpacity.value,
-	"--none-slice-opacity": backgroundOpacity.value,
+	'--slice-opacity': 1 - backgroundOpacity.value,
+	'--none-slice-opacity': backgroundOpacity.value,
 }));
 
 const state = reactive({
@@ -300,62 +257,50 @@ const state = reactive({
 	maxDistance: 160,
 	completed: false,
 	screenWidth: 375,
-});
+})
 
 const rpx2px = (value: number) => {
-	return (value * state.screenWidth) / 750;
-};
+	return (value * state.screenWidth) / 750
+}
 
 const px2rpx = (value: number) => {
-	return (value * 750) / state.screenWidth;
-};
+	return (value * 750) / state.screenWidth
+}
 
 const mainButtonStyle = computed(() => ({
-	transform: `translate(${px2rpx(state.currentX) - 60}rpx, ${
-		px2rpx(state.currentY) - 60
-	}rpx) scale(var(--float-scale))`,
-	transition: state.isDragging ? "none" : "",
-}));
+	transform: `translate(${px2rpx(state.currentX) - 50}rpx, ${px2rpx(state.currentY) - 50}rpx) scale(var(--float-scale))`,
+	transition: state.isDragging ? 'none' : '',
+}))
 
 const originPointStyle = computed(() => ({
 	transform: `translate(${px2rpx(state.originX) - 30}rpx, ${px2rpx(state.originY) - 30}rpx)`,
-}));
+}))
 
 const connectionStyle = computed(() => {
-	const dx = state.currentX - state.originX;
-	const dy = state.currentY - state.originY;
-	const distance = Math.sqrt(dx * dx + dy * dy);
-	const angle = Math.atan2(dy, dx);
+	const dx = state.currentX - state.originX
+	const dy = state.currentY - state.originY
+	const distance = Math.sqrt(dx * dx + dy * dy)
+	const angle = Math.atan2(dy, dx)
+
 	return {
 		width: `${px2rpx(distance)}rpx`,
-		transform: `translate(${px2rpx(state.originX)}rpx, ${px2rpx(
-			state.originY - 25
-		)}rpx) rotate(${angle}rad)`,
-	};
-});
+		transform: `translate(${px2rpx(state.originX)}rpx, ${px2rpx(state.originY - 25)}rpx) rotate(${angle}rad)`,
+	}
+})
 
 const distance = computed(() => {
-	return Number(connectionStyle.value.width.replace("rpx", ""));
-});
+	return Number(connectionStyle.value.width.replace('rpx', ''))
+})
 
 const connectSvgIcon = computed(() => {
-	// 这段代码是动态生成一个SVG图标，并将其转换为base64编码的数据URL
-	const width = rpx2px(Math.ceil(distance.value * 100) / 100); // 将rpx单位的距离转换为px，并四舍五入到两位小数
-	// 创建SVG字符串，定义一个自适应宽度的SVG图形
-	// viewBox设置为动态宽度和固定高度50
-	// 绘制一个填充为黄色(#f3d76a)的路径，形成一个类似连接线或箭头的形状
-	// 路径使用贝塞尔曲线(Q命令)创建平滑的曲线效果
-	// 路径会根据width动态调整大小，保持视觉上的连贯性
+	const width = rpx2px(Math.ceil(distance.value * 100) / 100)
 	const svg = `
 		<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${width} 50">
-			<path fill="#f3d76a" d="M 0 10 L 0 40 Q ${width / 2} 20, ${width} 50 L ${width} 0 Q ${
-		width / 2
-	} 30, 0 10 Z"></path>
+			<path fill="#f3d76a" d="M 0 10 L 0 40 Q ${width / 2} 20, ${width} 50 L ${width} 0 Q ${width / 2} 30, 0 10 Z"></path>
 		</svg>
-		`;
-	// 将SVG转换为base64编码的数据URL，可以直接用于img标签的src属性
-	return `data:image/svg+xml;base64,${btoa(svg)}`;
-});
+		`
+	return `data:image/svg+xml;base64,${btoa(svg)}`
+})
 
 const tranGuidSvgIcon = computed(() => {
 	const svg = `
@@ -363,79 +308,79 @@ const tranGuidSvgIcon = computed(() => {
 			<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
 				stroke-width="4" d="M42 19H6M30 7l12 12M6.799 29h36m-36 0l12 12" />
 		</svg>
-		`;
+		`
 	return `data:image/svg+xml;base64,${btoa(svg)}`;
-});
+})
+
 
 const tranTextWrapperStyle = computed(() => {
 	return {
-		opacity: 1 - Math.min(distance.value / 10, 1),
-	};
-});
+		opacity: 1 - Math.min(distance.value / 10, 1)
+	}
+})
 
 const initPosition = () => {
-	const { screenWidth, screenHeight } = uni.getSystemInfoSync();
-	state.screenWidth = screenWidth;
-	state.originX = (screenWidth / 5) * 4.2;
-	// state.originY = screenHeight / 1.68;
-	state.originY = 470;
-	state.currentX = state.originX;
-	state.currentY = state.originY;
-};
+	const { screenWidth, screenHeight } = uni.getSystemInfoSync()
+	state.screenWidth = screenWidth
+	state.originX = screenWidth / 5 * 4
+	state.originY = screenHeight / 2
+	state.currentX = state.originX
+	state.currentY = state.originY
+}
 
 const onTouchStart = () => {
-	state.isDragging = true;
-};
+	state.isDragging = true
+}
 
 const onTouchMove = (e: TouchEvent) => {
-	if (!state.isDragging) return;
-	const touch = e.touches[0];
+	if (!state.isDragging) return
+	const touch = e.touches[0]
 
-	let newX = state.originX;
-	let newY = touch.clientY;
+	let newX = state.originX
+	let newY = touch.clientY
 
-	const dx = newX - state.originX;
-	const dy = newY - state.originY;
-	const distance = Math.sqrt(dx * dx + dy * dy);
+	const dx = newX - state.originX
+	const dy = newY - state.originY
+	const distance = Math.sqrt(dx * dx + dy * dy)
 
 	if (distance > state.maxDistance) {
-		newX = state.originX + (dx * state.maxDistance) / distance;
-		newY = state.originY + (dy * state.maxDistance) / distance;
+		newX = state.originX + (dx * state.maxDistance) / distance
+		newY = state.originY + (dy * state.maxDistance) / distance
 	}
 
-	state.currentX = newX;
-	state.currentY = newY;
-};
+	state.currentX = newX
+	state.currentY = newY
+}
 
 const onTouchEnd = () => {
-	state.isDragging = false;
-	const offset = rpx2px(distance.value);
+	state.isDragging = false
+	const offset = rpx2px(distance.value)
 
-	if (offset > state.maxDistance - 10) {
-		state.completed = true;
+	if (offset > (state.maxDistance - 10)) {
+		state.completed = true
 		setTimeout(() => {
 			uni.switchTab({
-				url: "/pages/index/my",
-				animationType: "slide-in-right",
+				url: '/pages/index/my',
+				animationType: 'slide-in-right',
 				animationDuration: 200,
-				success: (res) => {},
-				fail: () => {},
+				success: res => { },
+				fail: () => { },
 				complete: () => {
-					state.completed = false;
-					state.currentX = state.originX;
-					state.currentY = state.originY;
-				},
+					state.completed = false
+					state.currentX = state.originX
+					state.currentY = state.originY
+				}
 			});
-		}, 400);
+		}, 400)
 	} else {
-		state.currentX = state.originX;
-		state.currentY = state.originY;
+		state.currentX = state.originX
+		state.currentY = state.originY
 	}
-};
+}
 
 onMounted(() => {
-	initPosition();
-});
+	initPosition()
+})
 
 const handleTouchStart = (e: TouchEvent) => {
 	if (isAnimating.value) return;
@@ -523,7 +468,7 @@ const tranOpacity = computed(() => {
 
 const tranStyle = computed(() => ({
 	opacity: tranOpacity.value,
-	transition: isAnimating.value ? "opacity 0.3s ease" : "none",
+	transition: isAnimating.value ? 'opacity 0.3s ease' : 'none',
 }));
 
 // tran 按钮移动相关状态
@@ -537,7 +482,7 @@ const tranTextOpacity = computed(() => {
 
 const tranTextStyle = computed(() => ({
 	opacity: tranTextOpacity.value,
-	transition: "opacity 0.3s ease",
+	transition: 'opacity 0.3s ease',
 }));
 </script>
 
@@ -584,6 +529,9 @@ const tranTextStyle = computed(() => ({
 	left: 0;
 	z-index: 1;
 }
+
+/* 动画类 */
+.slide-up {}
 
 .main {
 	height: 100vh;
@@ -669,6 +617,30 @@ const tranTextStyle = computed(() => ({
 			color: #dd9734;
 		}
 
+		&:nth-child(2) {
+			display: flex;
+			align-items: center;
+			gap: 10rpx;
+
+			.t {
+				font-size: 35rpx;
+				font-weight: bold;
+			}
+
+			.money {
+				font-size: 42rpx;
+			}
+
+			.money-mini {
+				font-size: 34rpx;
+				font-weight: 800;
+			}
+
+			.money-fh {
+				font-size: 18rpx;
+			}
+		}
+
 		.card-t {
 			display: flex;
 			flex-direction: row;
@@ -679,29 +651,6 @@ const tranTextStyle = computed(() => ({
 			.jiantou-right {
 				position: relative;
 				left: 5rpx;
-			}
-			&:nth-child(2) {
-				display: flex;
-				align-items: center;
-				gap: 10rpx;
-
-				.t {
-					font-size: 35rpx;
-					font-weight: bold;
-				}
-
-				.money {
-					font-size: 42rpx;
-				}
-
-				.money-mini {
-					font-size: 34rpx;
-					font-weight: 800;
-				}
-
-				.money-fh {
-					font-size: 18rpx;
-				}
 			}
 		}
 	}
@@ -736,6 +685,7 @@ const tranTextStyle = computed(() => ({
 			}
 
 			@keyframes rotate-bottom {
+
 				0%,
 				100% {
 					transform: rotate(0deg);
@@ -845,7 +795,7 @@ const tranTextStyle = computed(() => ({
 
 		&::before,
 		&::after {
-			content: "";
+			content: '';
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -1105,8 +1055,8 @@ const tranTextStyle = computed(() => ({
 .main-btn {
 	pointer-events: initial;
 	position: absolute;
-	width: 120rpx;
-	height: 120rpx;
+	width: 100rpx;
+	height: 100rpx;
 	background-color: var(--float-background-color);
 	border-radius: 50%;
 	transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
@@ -1149,11 +1099,11 @@ const tranTextStyle = computed(() => ({
 	align-items: center;
 
 	&.tran-out {
-		top: -56rpx;
+		top: -66rpx;
 	}
 
 	&.tran-in {
-		bottom: -56rpx;
+		bottom: -66rpx;
 	}
 }
 
