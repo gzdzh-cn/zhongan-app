@@ -261,6 +261,7 @@ const logoSrc = ref("/static/3156/logo.png");
 const { setting } = dzhStore();
 
 const viewportHeight = ref(uni.getSystemInfoSync().windowHeight);
+const viewportWidth = ref(uni.getSystemInfoSync().windowWidth);
 
 const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
@@ -269,12 +270,39 @@ const UP_THRESHOLD = 10; // 上滑阈值
 const DOWN_THRESHOLD = 5; // 下滑阈值
 const isAtTop = ref(false); // 是否在顶部位置
 
-const TOP_POSITION = -viewportHeight.value * 0.56;
+// 计算section-two的初始位置到顶部的距离
+const INITIAL_TOP_DISTANCE = 760; // section-two的初始top值（rpx）
+const INITIAL_TOP_DISTANCE_PX = (INITIAL_TOP_DISTANCE * viewportWidth.value) / 750; // 转换为px
+
+const TOP_POSITION = -INITIAL_TOP_DISTANCE_PX; // 最大上滑距离为初始位置到顶部的距离
 const INITIAL_POSITION = 0;
+
+// 监听屏幕尺寸变化
+onMounted(() => {
+	initPosition();
+	// 监听屏幕尺寸变化
+	uni.onWindowResize(() => {
+		viewportHeight.value = uni.getSystemInfoSync().windowHeight;
+		viewportWidth.value = uni.getSystemInfoSync().windowWidth;
+		// 重新计算TOP_POSITION
+		const newTopPosition = -(INITIAL_TOP_DISTANCE * viewportWidth.value) / 750;
+		// 如果当前在顶部，更新位置
+		if (isAtTop.value) {
+			currentOffset.value = newTopPosition;
+		}
+	});
+});
+const windowResizeCallback = (res:any) => {
+  console.log('res',res)
+ 
+}
+onBeforeUnmount(() => {
+	uni.offWindowResize(windowResizeCallback);
+});
 
 // 计算背景图片透明度
 const backgroundOpacity = computed(() => {
-	const progress = Math.abs(currentOffset.value) / 20; // 使用20px作为渐变范围
+	const progress = Math.abs(currentOffset.value) / INITIAL_TOP_DISTANCE_PX; // 使用实际距离作为渐变范围
 	return Math.min(1, Math.max(0, progress));
 });
 
@@ -386,86 +414,6 @@ const initPosition = () => {
 	state.currentY = state.originY;
 };
 
-const onTouchStart = () => {
-	state.isDragging = true;
-};
-
-const onTouchMove = (e: TouchEvent) => {
-	if (isAnimating.value) return;
-
-	const deltaY = e.touches[0].clientY - touchStartY.value;
-	const nextOffset = currentOffset.value + deltaY;
-
-	// 限制滑动范围
-	if (nextOffset >= INITIAL_POSITION) {
-		currentOffset.value = INITIAL_POSITION;
-		isAtTop.value = false;
-	} else if (nextOffset <= TOP_POSITION) {
-		currentOffset.value = TOP_POSITION;
-		isAtTop.value = true;
-	} else {
-		currentOffset.value = nextOffset;
-	}
-
-	// 如果移动距离超过阈值，自动滑动到顶部
-	if (Math.abs(deltaY) > UP_THRESHOLD && deltaY < 0) {
-		isAnimating.value = true;
-		currentOffset.value = TOP_POSITION;
-		isAtTop.value = true;
-		setTimeout(() => {
-			isAnimating.value = false;
-		}, 300);
-	}
-
-	// 如果在顶部位置，检测下滑
-	if (isAtTop.value && deltaY > 0) {
-		if (deltaY > DOWN_THRESHOLD) {
-			isAnimating.value = true;
-			currentOffset.value = INITIAL_POSITION;
-			isAtTop.value = false;
-			setTimeout(() => {
-				isAnimating.value = false;
-			}, 300);
-		}
-	}
-
-	// 更新初始点，便于连续滑动
-	touchStartY.value = e.touches[0].clientY;
-};
-
-const onTouchEnd = () => {
-	if (isAnimating.value) return;
-
-	isAnimating.value = true;
-	const deltaY = currentOffset.value - INITIAL_POSITION;
-
-	// 如果在顶部位置，检测下滑
-	if (isAtTop.value && deltaY > 0) {
-		// 只要在顶部位置下滑，就回到初始位置
-		currentOffset.value = INITIAL_POSITION;
-		isAtTop.value = false;
-	} else {
-		// 如果移动距离小于阈值，恢复到初始位置
-		if (Math.abs(deltaY) < UP_THRESHOLD) {
-			currentOffset.value = INITIAL_POSITION;
-			isAtTop.value = false;
-		} else {
-			// 如果移动距离超过阈值，滑动到顶部
-			currentOffset.value = TOP_POSITION;
-			isAtTop.value = true;
-		}
-	}
-
-	// 动画结束后移除 transition
-	setTimeout(() => {
-		isAnimating.value = false;
-	}, 300);
-};
-
-onMounted(() => {
-	initPosition();
-});
-
 const handleTouchStart = (e: TouchEvent) => {
 	if (isAnimating.value) return;
 	touchStartY.value = e.touches[0].clientY;
@@ -515,7 +463,7 @@ const handleTouchMove = (e: TouchEvent) => {
 	touchStartY.value = e.touches[0].clientY;
 };
 
-const handleTouchEnd = () => {
+const handleTouchEnd = (e: TouchEvent) => {
 	if (isAnimating.value) return;
 
 	isAnimating.value = true;
