@@ -1,6 +1,6 @@
 <template>
 	<view class="tabbar">
-		<!-- <view class="tabbar__inner">
+		 <view class="tabbar__inner">
 			<view
 				class="item"
 				v-for="(item, index) in list"
@@ -24,7 +24,7 @@
 					<view class="badge" v-if="item.number > 0">{{ item.number || 0 }}</view>
 				</template>
 			</view>
-		</view> -->
+		</view>  
 	</view>
 </template>
 

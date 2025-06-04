@@ -120,7 +120,7 @@
 					<view class="card">
 						<view class="title">
 							<u-icon name="bell-fill" color="#f2c342" size="36"></u-icon>
-							<text>消息(+14)</text>
+							<text class="t-h">消息(+14)</text>
 						</view>
 						<view class="con">
 							<view class="left">
@@ -132,7 +132,7 @@
 									<text>「最佳销售」基金排行榜更新了 </text>
 								</view>
 								<view class="con">
-									<text>查看过往3个月最受欢迎的基金。投资...</text>
+									<text class="t-desc">查看过往3个月最受欢迎的基金。投资...</text>
 								</view>
 							</view>
 						</view>
@@ -265,7 +265,8 @@ const viewportHeight = ref(uni.getSystemInfoSync().windowHeight);
 const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
 const isAnimating = ref(false);
-const THRESHOLD = 30;
+const UP_THRESHOLD = 10; // 上滑阈值
+const DOWN_THRESHOLD = 5; // 下滑阈值
 const isAtTop = ref(false); // 是否在顶部位置
 
 const TOP_POSITION = -viewportHeight.value * 0.56;
@@ -289,6 +290,8 @@ const backgroundStyle = computed(() => ({
 	transition: isAnimating.value ? "all 0.3s ease" : "none",
 	"--slice-opacity": 1 - backgroundOpacity.value,
 	"--none-slice-opacity": backgroundOpacity.value,
+	"--slice-image": isAtTop.value ? "url(/static/3156/img/slice-end.png)" : "url(/static/3156/img/slice.png)",
+	"--none-slice-image": isAtTop.value ? "url(/static/3156/img/slice-end.png)" : "url(/static/3156/img/none-slice.png)"
 }));
 
 const state = reactive({
@@ -388,49 +391,75 @@ const onTouchStart = () => {
 };
 
 const onTouchMove = (e: TouchEvent) => {
-	if (!state.isDragging) return;
-	const touch = e.touches[0];
+	if (isAnimating.value) return;
 
-	let newX = state.originX;
-	let newY = touch.clientY;
+	const deltaY = e.touches[0].clientY - touchStartY.value;
+	const nextOffset = currentOffset.value + deltaY;
 
-	const dx = newX - state.originX;
-	const dy = newY - state.originY;
-	const distance = Math.sqrt(dx * dx + dy * dy);
-
-	if (distance > state.maxDistance) {
-		newX = state.originX + (dx * state.maxDistance) / distance;
-		newY = state.originY + (dy * state.maxDistance) / distance;
+	// 限制滑动范围
+	if (nextOffset >= INITIAL_POSITION) {
+		currentOffset.value = INITIAL_POSITION;
+		isAtTop.value = false;
+	} else if (nextOffset <= TOP_POSITION) {
+		currentOffset.value = TOP_POSITION;
+		isAtTop.value = true;
+	} else {
+		currentOffset.value = nextOffset;
 	}
 
-	state.currentX = newX;
-	state.currentY = newY;
+	// 如果移动距离超过阈值，自动滑动到顶部
+	if (Math.abs(deltaY) > UP_THRESHOLD && deltaY < 0) {
+		isAnimating.value = true;
+		currentOffset.value = TOP_POSITION;
+		isAtTop.value = true;
+		setTimeout(() => {
+			isAnimating.value = false;
+		}, 300);
+	}
+
+	// 如果在顶部位置，检测下滑
+	if (isAtTop.value && deltaY > 0) {
+		if (deltaY > DOWN_THRESHOLD) {
+			isAnimating.value = true;
+			currentOffset.value = INITIAL_POSITION;
+			isAtTop.value = false;
+			setTimeout(() => {
+				isAnimating.value = false;
+			}, 300);
+		}
+	}
+
+	// 更新初始点，便于连续滑动
+	touchStartY.value = e.touches[0].clientY;
 };
 
 const onTouchEnd = () => {
-	state.isDragging = false;
-	const offset = rpx2px(distance.value);
+	if (isAnimating.value) return;
 
-	if (offset > state.maxDistance - 10) {
-		state.completed = true;
-		setTimeout(() => {
-			uni.switchTab({
-				url: "/pages/index/my",
-				animationType: "slide-in-right",
-				animationDuration: 200,
-				success: (res) => {},
-				fail: () => {},
-				complete: () => {
-					state.completed = false;
-					state.currentX = state.originX;
-					state.currentY = state.originY;
-				},
-			});
-		}, 400);
+	isAnimating.value = true;
+	const deltaY = currentOffset.value - INITIAL_POSITION;
+
+	// 如果在顶部位置，检测下滑
+	if (isAtTop.value && deltaY > 0) {
+		// 只要在顶部位置下滑，就回到初始位置
+		currentOffset.value = INITIAL_POSITION;
+		isAtTop.value = false;
 	} else {
-		state.currentX = state.originX;
-		state.currentY = state.originY;
+		// 如果移动距离小于阈值，恢复到初始位置
+		if (Math.abs(deltaY) < UP_THRESHOLD) {
+			currentOffset.value = INITIAL_POSITION;
+			isAtTop.value = false;
+		} else {
+			// 如果移动距离超过阈值，滑动到顶部
+			currentOffset.value = TOP_POSITION;
+			isAtTop.value = true;
+		}
 	}
+
+	// 动画结束后移除 transition
+	setTimeout(() => {
+		isAnimating.value = false;
+	}, 300);
 };
 
 onMounted(() => {
@@ -452,14 +481,16 @@ const handleTouchMove = (e: TouchEvent) => {
 	// 限制滑动范围
 	if (nextOffset >= INITIAL_POSITION) {
 		currentOffset.value = INITIAL_POSITION;
+		isAtTop.value = false;
 	} else if (nextOffset <= TOP_POSITION) {
 		currentOffset.value = TOP_POSITION;
+		isAtTop.value = true;
 	} else {
 		currentOffset.value = nextOffset;
 	}
 
 	// 如果移动距离超过阈值，自动滑动到顶部
-	if (Math.abs(deltaY) > THRESHOLD && deltaY < 0) {
+	if (Math.abs(deltaY) > UP_THRESHOLD && deltaY < 0) {
 		isAnimating.value = true;
 		currentOffset.value = TOP_POSITION;
 		isAtTop.value = true;
@@ -470,7 +501,7 @@ const handleTouchMove = (e: TouchEvent) => {
 
 	// 如果在顶部位置，检测下滑
 	if (isAtTop.value && deltaY > 0) {
-		if (deltaY > THRESHOLD) {
+		if (deltaY > DOWN_THRESHOLD) {
 			isAnimating.value = true;
 			currentOffset.value = INITIAL_POSITION;
 			isAtTop.value = false;
@@ -492,15 +523,12 @@ const handleTouchEnd = () => {
 
 	// 如果在顶部位置，检测下滑
 	if (isAtTop.value && deltaY > 0) {
-		if (deltaY > THRESHOLD) {
-			currentOffset.value = INITIAL_POSITION;
-			isAtTop.value = false;
-		} else {
-			currentOffset.value = TOP_POSITION;
-		}
+		// 只要在顶部位置下滑，就回到初始位置
+		currentOffset.value = INITIAL_POSITION;
+		isAtTop.value = false;
 	} else {
 		// 如果移动距离小于阈值，恢复到初始位置
-		if (Math.abs(deltaY) < THRESHOLD) {
+		if (Math.abs(deltaY) < UP_THRESHOLD) {
 			currentOffset.value = INITIAL_POSITION;
 			isAtTop.value = false;
 		} else {
@@ -517,7 +545,7 @@ const handleTouchEnd = () => {
 };
 
 const tranOpacity = computed(() => {
-	const progress = Math.abs(currentOffset.value) / 30; // 使用30px作为渐变范围
+	const progress = Math.abs(currentOffset.value) / 20; // 使用30px作为渐变范围
 	return Math.max(0, 1 - progress);
 });
 
@@ -531,7 +559,7 @@ const tranCurrentY = ref(0);
 
 // tran 文本透明度计算
 const tranTextOpacity = computed(() => {
-	const progress = Math.abs(tranCurrentY.value) / 30;
+	const progress = Math.abs(tranCurrentY.value) / 20;
 	return Math.max(0, 1 - progress);
 });
 
@@ -843,7 +871,21 @@ const tranTextStyle = computed(() => ({
 		z-index: 0;
 		pointer-events: none;
 
-		&::before,
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-size: 100% auto;
+			background-repeat: no-repeat;
+			background-position: center top;
+			transition: opacity 0.3s ease;
+			background-image: var(--slice-image);
+			opacity: var(--slice-opacity);
+		}
+
 		&::after {
 			content: "";
 			position: absolute;
@@ -851,19 +893,11 @@ const tranTextStyle = computed(() => ({
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background-size: 100% 100%;
+			background-size: 100% auto;
 			background-repeat: no-repeat;
-			background-position: center center;
+			background-position: center top;
 			transition: opacity 0.3s ease;
-		}
-
-		&::before {
-			background-image: url(/static/3156/img/slice.png);
-			opacity: var(--slice-opacity);
-		}
-
-		&::after {
-			background-image: url(/static/3156/img/none-slice.png);
+			background-image: var(--none-slice-image);
 			opacity: var(--none-slice-opacity);
 		}
 	}
@@ -895,7 +929,7 @@ const tranTextStyle = computed(() => ({
 				align-items: center;
 				gap: 5rpx;
 
-				span {
+				.t-h {
 					font-weight: 300;
 				}
 			}
@@ -945,7 +979,7 @@ const tranTextStyle = computed(() => ({
 					}
 
 					.con {
-						span {
+						.t-desc {
 							font-weight: 300;
 						}
 					}
