@@ -1,16 +1,52 @@
 @font-face {
-  font-family: "iconfont-3156"; /* Project id 4921662 */
-  src: url('iconfont.woff2?t=1747543775063') format('woff2'),
-       url('iconfont.woff?t=1747543775063') format('woff'),
-       url('iconfont.ttf?t=1747543775063') format('truetype');
+  font-family: "iconfont"; /* Project id 4921662 */
+  src: url('iconfont.woff2?t=1749103522588') format('woff2'),
+       url('iconfont.woff?t=1749103522588') format('woff'),
+       url('iconfont.ttf?t=1749103522588') format('truetype');
 }
 
 .iconfont-3156 {
-  font-family: "iconfont-3156" !important;
+  font-family: "iconfont" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-sanjiaoxing_xiangxia:before {
+  content: "\e602";
+}
+
+.icon-shaixuan-F:before {
+  content: "\e617";
+}
+
+.icon-browse:before {
+  content: "\e6e0";
+}
+
+.icon-yanjing:before {
+  content: "\e6bb";
+}
+
+.icon-yanjing1:before {
+  content: "\e600";
+}
+
+.icon-yanjing2:before {
+  content: "\e6cb";
+}
+
+.icon-yanjing3:before {
+  content: "\e653";
+}
+
+.icon-yanjing4:before {
+  content: "\e65f";
+}
+
+.icon-sousuoyanjing:before {
+  content: "\e860";
 }
 
 .icon-xiangshangjiantoukuan-xianxing:before {

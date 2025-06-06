@@ -7,7 +7,7 @@
 			@touchmove="handleTouchMove"
 			@touchend="handleTouchEnd"
 		>
-			<view class="section1 section-one">
+			<view class="section-one" :style="sectionOneStyle">
 				<!-- logo -->
 				<view class="head">
 					<view class="nav-item-l">
@@ -36,6 +36,12 @@
 					<view class="card left">
 						<view class="card-t">
 							<text class="t"> 总结余 (HKD等值)</text>
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-yanjing2"
+								size="17"
+								class="yanjing"
+							></uni-icons>
 						</view>
 						<view class="card-t">
 							<text class="t numFont money">106<text class="numFont money-mini">.00</text></text>
@@ -112,87 +118,143 @@
 				</view>
 			</view>
 
-			<view class="news section-two" :style="sectionStyle">
-				<view class="background-layer" :style="backgroundStyle"></view>
+			<view class="section-two" :style="sectionTwoStyle">
+				<view class="background-layer" :style="backgroundStyle" ></view>
 				<view class="new-contain">
-					<span class="t"> 动态 </span>
+					<view class="new-head" v-show="!isAtTop">
+						<span class="t"> 动态 </span>
+					</view>
 
-					<view class="card">
-						<view class="title">
-							<u-icon name="bell-fill" color="#f2c342" size="36"></u-icon>
-							<text class="t-h">消息(+14)</text>
-						</view>
-						<view class="con">
-							<view class="left">
-								<image src="/static/3156/img/new-1.png" mode="aspectFit" class="new-img" />
+					<scroll-view
+						:scroll-top="scrollTop"
+						:scroll-y="isAtTop"
+						class="scroll-Y"
+						@scrolltoupper="upper"
+						@scrolltolower="lower"
+						@scroll="scroll"
+					>
+						<view class="list">
+							<view class="top-title" v-show="isAtTop">
+								<span class="t-current-m">动态 - 全部</span>
 							</view>
-							<view class="right">
+							<view class="new-head2" v-show="isAtTop">
+								<view class="current-m">
+									<span class="t-current-m">本月</span>
+									<uni-icons
+										custom-prefix="iconfont-3156"
+										type="icon-sanjiaoxing_xiangxia"
+										size="12"
+										color="#737481"
+									></uni-icons>
+								</view>
+								<uni-icons
+									custom-prefix="iconfont-3156"
+									type="icon-shaixuan-F"
+									size="20"
+									color="#737481"
+								></uni-icons>
+							</view>
+
+							<view class="card">
 								<view class="title">
-									<image src="/static/3156/img/new-icon.png" mode="aspectFit" class="new-icon" />
-									<text>「最佳销售」基金排行榜更新了 </text>
+									<u-icon name="bell-fill" color="#f2c342" size="36"></u-icon>
+									<text class="t-h">消息(+14) [{{ isAtTop }}]</text>
 								</view>
 								<view class="con">
-									<text class="t-desc">查看过往3个月最受欢迎的基金。投资...</text>
+									<view class="left">
+										<image src="/static/3156/img/new-1.png" mode="aspectFit" class="new-img" />
+									</view>
+									<view class="right">
+										<view class="title">
+											<image
+												src="/static/3156/img/new-icon.png"
+												mode="aspectFit"
+												class="new-icon"
+											/>
+											<text>「最佳销售」基金排行榜更新了 </text>
+										</view>
+										<view class="con">
+											<text class="t-desc">查看过往3个月最受欢迎的基金。投资...</text>
+										</view>
+									</view>
 								</view>
 							</view>
-						</view>
-					</view>
 
-					<view class="card">
-						<view class="con">
-							<view class="left">
-								<image src="/static/3156/img/icon1.png" mode="aspectFit" class="new-img icon" />
-							</view>
-							<view class="right">
-								<view class="title jiangli">
-									<text>有2个新用户专属任务在等你！即刻做任务赚丰富奖...</text>
-								</view>
+							<view class="card">
 								<view class="con">
-									<text>5月12日 13:20</text>
+									<view class="left">
+										<image src="/static/3156/img/icon1.png" mode="aspectFit" class="new-img icon" />
+									</view>
+									<view class="right">
+										<view class="title jiangli">
+											<text>有2个新用户专属任务在等你！即刻做任务赚丰富奖...</text>
+										</view>
+										<view class="con">
+											<text>5月12日 13:20</text>
+										</view>
+									</view>
 								</view>
 							</view>
-						</view>
-					</view>
 
-					<view class="card">
-						<view class="con">
-							<view class="left">
-								<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
-							</view>
-							<view class="right">
-								<view class="title jiangli">
-									<text>成功用新设备登录</text>
-								</view>
+							<view class="card">
 								<view class="con">
-									<text>5月9日 00:35</text>
+									<view class="left">
+										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
+									</view>
+									<view class="right">
+										<view class="title jiangli">
+											<text>成功用新设备登录</text>
+										</view>
+										<view class="con">
+											<text>5月9日 00:35</text>
+										</view>
+									</view>
 								</view>
 							</view>
-						</view>
-					</view>
 
-					<view class="ad">
-						<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
-					</view>
-
-					<view class="card">
-						<view class="con">
-							<view class="left">
-								<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
+							<view class="ad">
+								<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
 							</view>
-							<view class="right">
-								<view class="title jiangli">
-									<text>成功用新设备登录</text>
-								</view>
+
+							<view class="card">
 								<view class="con">
-									<text>5月9日 00:35</text>
+									<view class="left">
+										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
+									</view>
+									<view class="right">
+										<view class="title jiangli">
+											<text>签到成功</text>
+										</view>
+										<view class="con">
+											<text>5月7日 11:34</text>
+										</view>
+									</view>
 								</view>
 							</view>
-						</view>
-					</view>
 
-					<view class="ad">
-						<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
-					</view>
+							<view class="ad">
+								<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
+							</view>
+
+							<view class="new-head2" v-show="isAtTop">
+								<view class="current-m">
+									<span class="t-current-m">本月</span>
+									<uni-icons
+										custom-prefix="iconfont-3156"
+										type="icon-sanjiaoxing_xiangxia"
+										size="15"
+										color="#737481"
+									></uni-icons>
+								</view>
+								<uni-icons
+									custom-prefix="iconfont-3156"
+									type="icon-shaixuan-F"
+									size="20"
+									color="#737481"
+								></uni-icons>
+							</view>
+						</view>
+					</scroll-view>
 				</view>
 			</view>
 
@@ -267,42 +329,20 @@ const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
 const isAnimating = ref(false);
 const UP_THRESHOLD = 10; // 上滑阈值
-const DOWN_THRESHOLD = 5; // 下滑阈值
+const DOWN_THRESHOLD = 10; // 下滑阈值
 const isAtTop = ref(false); // 是否在顶部位置
 
 // 计算section-two的初始位置到顶部的距离
 const INITIAL_TOP_DISTANCE = 760; // section-two的初始top值（rpx）
 const INITIAL_TOP_DISTANCE_PX = (INITIAL_TOP_DISTANCE * viewportWidth.value) / 750; // 转换为px
 
+// 修改TOP_POSITION的计算方式，确保不会超过初始位置
 const TOP_POSITION = -INITIAL_TOP_DISTANCE_PX; // 最大上滑距离为初始位置到顶部的距离
 const INITIAL_POSITION = 0;
 
-// 监听屏幕尺寸变化
-onMounted(() => {
-	initPosition();
-	// 监听屏幕尺寸变化
-	uni.onWindowResize(() => {
-		viewportHeight.value = uni.getSystemInfoSync().windowHeight;
-		viewportWidth.value = uni.getSystemInfoSync().windowWidth;
-		// 重新计算TOP_POSITION
-		const newTopPosition = -(INITIAL_TOP_DISTANCE * viewportWidth.value) / 750;
-		// 如果当前在顶部，更新位置
-		if (isAtTop.value) {
-			currentOffset.value = newTopPosition;
-		}
-	});
-});
-const windowResizeCallback = (res:any) => {
-  console.log('res',res)
- 
-}
-onBeforeUnmount(() => {
-	uni.offWindowResize(windowResizeCallback);
-});
-
 // 计算背景图片透明度
 const backgroundOpacity = computed(() => {
-	const progress = Math.abs(currentOffset.value) / INITIAL_TOP_DISTANCE_PX; // 使用实际距离作为渐变范围
+	const progress = Math.abs(currentOffset.value) / 10; // 使用10px作为渐变范围
 	return Math.min(1, Math.max(0, progress));
 });
 
@@ -318,8 +358,25 @@ const backgroundStyle = computed(() => ({
 	transition: isAnimating.value ? "all 0.3s ease" : "none",
 	"--slice-opacity": 1 - backgroundOpacity.value,
 	"--none-slice-opacity": backgroundOpacity.value,
-	"--slice-image": isAtTop.value ? "url(/static/3156/img/slice-end.png)" : "url(/static/3156/img/slice.png)",
-	"--none-slice-image": isAtTop.value ? "url(/static/3156/img/slice-end.png)" : "url(/static/3156/img/none-slice.png)"
+	"--slice-image": "url(/static/3156/img/slice.png)",
+	"--none-slice-image": isAtTop.value
+		? "url(/static/3156/img/slice-end.png)"
+		: "url(/static/3156/img/none-slice.png)",
+	"--after-top": isAtTop.value ? "3.75rem" : "0",
+}));
+
+// 添加 section-one 的样式计算属性
+const sectionOneStyle = computed(() => ({
+	opacity: isAtTop.value ? 0 : 1, // 只在到达顶部时完全透明
+	transition: "opacity 0.3s ease",
+}));
+
+// 添加 section-two 的样式计算属性
+const sectionTwoStyle = computed(() => ({
+	transform: `translateY(${currentOffset.value}px)`,
+	transition: isAnimating.value ? "transform 0.3s ease" : "none",
+	willChange: "transform",
+	paddingTop:  "220rpx",
 }));
 
 const state = reactive({
@@ -414,6 +471,92 @@ const initPosition = () => {
 	state.currentY = state.originY;
 };
 
+const onTouchStart = () => {
+	state.isDragging = true;
+};
+
+const onTouchMove = (e: TouchEvent) => {
+	if (!state.isDragging) return;
+	const touch = e.touches[0];
+
+	let newX = state.originX;
+	let newY = touch.clientY;
+
+	const dx = newX - state.originX;
+	const dy = newY - state.originY;
+	const distance = Math.sqrt(dx * dx + dy * dy);
+
+	if (distance > state.maxDistance) {
+		newX = state.originX + (dx * state.maxDistance) / distance;
+		newY = state.originY + (dy * state.maxDistance) / distance;
+	}
+
+	state.currentX = newX;
+	state.currentY = newY;
+};
+
+const onTouchEnd = () => {
+	state.isDragging = false;
+	const offset = rpx2px(distance.value);
+
+	if (offset > state.maxDistance - 10) {
+		state.completed = true;
+		setTimeout(() => {
+			uni.switchTab({
+				url: "/pages/index/my",
+				animationType: "slide-in-right",
+				animationDuration: 200,
+				success: (res) => {},
+				fail: () => {},
+				complete: () => {
+					state.completed = false;
+					state.currentX = state.originX;
+					state.currentY = state.originY;
+				},
+			});
+		}, 400);
+	} else {
+		state.currentX = state.originX;
+		state.currentY = state.originY;
+	}
+};
+
+// 监听屏幕尺寸变化
+const windowResizeCallback = () => {
+	viewportHeight.value = uni.getSystemInfoSync().windowHeight;
+	viewportWidth.value = uni.getSystemInfoSync().windowWidth;
+	// 重新计算TOP_POSITION
+	const newTopPosition = -(INITIAL_TOP_DISTANCE * viewportWidth.value) / 750;
+	// 如果当前在顶部，更新位置
+	if (isAtTop.value) {
+		currentOffset.value = newTopPosition;
+	}
+};
+
+const scrollTop = ref(0);
+const old = ref({
+	scrollTop: 0,
+});
+const upper = (e: any) => {
+	console.log("滚动到顶部");
+};
+const lower = (e: any) => {
+	console.log("滚动到底部");
+};
+const scroll = (e: any) => {
+	// console.log(e);
+	old.value.scrollTop = e.detail.scrollTop;
+};
+
+onMounted(() => {
+	initPosition();
+	uni.onWindowResize(windowResizeCallback);
+});
+
+onBeforeUnmount(() => {
+	uni.offWindowResize(windowResizeCallback);
+});
+
 const handleTouchStart = (e: TouchEvent) => {
 	if (isAnimating.value) return;
 	touchStartY.value = e.touches[0].clientY;
@@ -437,8 +580,9 @@ const handleTouchMove = (e: TouchEvent) => {
 		currentOffset.value = nextOffset;
 	}
 
-	// 如果移动距离超过阈值，自动滑动到顶部
-	if (Math.abs(deltaY) > UP_THRESHOLD && deltaY < 0) {
+	// section-two专用吸附逻辑
+	if (!isAtTop.value && deltaY < -10) {
+		// 上滑超过10px，吸附到顶部
 		isAnimating.value = true;
 		currentOffset.value = TOP_POSITION;
 		isAtTop.value = true;
@@ -446,47 +590,39 @@ const handleTouchMove = (e: TouchEvent) => {
 			isAnimating.value = false;
 		}, 300);
 	}
-
-	// 如果在顶部位置，检测下滑
-	if (isAtTop.value && deltaY > 0) {
-		if (deltaY > DOWN_THRESHOLD) {
-			isAnimating.value = true;
-			currentOffset.value = INITIAL_POSITION;
-			isAtTop.value = false;
-			setTimeout(() => {
-				isAnimating.value = false;
-			}, 300);
-		}
+	if (isAtTop.value && deltaY > 5) {
+		// 在顶部下滑超过5px，回到初始位置
+		isAnimating.value = true;
+		currentOffset.value = INITIAL_POSITION;
+		isAtTop.value = false;
+		setTimeout(() => {
+			isAnimating.value = false;
+		}, 300);
 	}
 
-	// 更新初始点，便于连续滑动
 	touchStartY.value = e.touches[0].clientY;
 };
 
-const handleTouchEnd = (e: TouchEvent) => {
+const handleTouchEnd = () => {
 	if (isAnimating.value) return;
 
 	isAnimating.value = true;
 	const deltaY = currentOffset.value - INITIAL_POSITION;
 
-	// 如果在顶部位置，检测下滑
-	if (isAtTop.value && deltaY > 0) {
-		// 只要在顶部位置下滑，就回到初始位置
+	if (isAtTop.value && deltaY > 5) {
+		// 在顶部下滑超过5px，回到初始位置
 		currentOffset.value = INITIAL_POSITION;
 		isAtTop.value = false;
-	} else {
-		// 如果移动距离小于阈值，恢复到初始位置
-		if (Math.abs(deltaY) < UP_THRESHOLD) {
-			currentOffset.value = INITIAL_POSITION;
-			isAtTop.value = false;
-		} else {
-			// 如果移动距离超过阈值，滑动到顶部
-			currentOffset.value = TOP_POSITION;
-			isAtTop.value = true;
-		}
+	} else if (!isAtTop.value && Math.abs(deltaY) > 10 && deltaY < 0) {
+		// 上滑超过10px，吸附到顶部
+		currentOffset.value = TOP_POSITION;
+		isAtTop.value = true;
+	} else if (!isAtTop.value) {
+		// 未达到阈值，回到初始位置
+		currentOffset.value = INITIAL_POSITION;
+		isAtTop.value = false;
 	}
 
-	// 动画结束后移除 transition
 	setTimeout(() => {
 		isAnimating.value = false;
 	}, 300);
@@ -547,269 +683,268 @@ const tranTextStyle = computed(() => ({
 	box-sizing: border-box;
 }
 
-.section-one {
-	height: 760rpx;
-	position: fixed;
-	z-index: 0;
-}
-
-.section-two {
-	height: 100vh;
-	position: absolute;
-	top: 760rpx;
-	left: 0;
-	z-index: 1;
-}
-
 .main {
 	height: 100vh;
 	position: relative;
 	overflow: hidden;
-}
-
-.section1 {
-	padding: 30rpx 26rpx 0 26rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	// padding: 30rpx 26rpx 0 26rpx;
+	padding-top: 30rpx;
 }
 
 .numFont {
 	font-family: "number-3156" !important;
 	letter-spacing: 0.001rem;
 }
+.section-one {
+	height: 760rpx;
+	position: fixed;
+	z-index: 0;
+	transition: opacity 0.3s ease;
+	will-change: opacity;
+	width: 90%;
 
-.head {
-	width: 100%;
-	height: 90rpx;
-	padding: 0 10rpx;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	overflow: hidden;
-	// border: 1px solid #ccc;
-	overflow: hidden;
-
-	.nav-item-l {
-		display: flex;
-		gap: 15rpx;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-
-		.logo-img {
-			width: 68rpx;
-			height: 68rpx;
-			overflow: hidden;
-		}
-
-		.name {
-			font-weight: bold;
-			font-size: 32rpx;
-			letter-spacing: 0.001rem;
-		}
-	}
-
-	.nav-item-r {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-		gap: 34rpx;
-
-		.kf {
-			font-weight: b;
-		}
-	}
-}
-
-.hd {
-	margin-top: 20rpx;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 10rpx;
-
-	.card {
-		background-color: #fff;
-		padding: 20rpx 30rpx;
-		border-radius: 30rpx;
+	.head {
 		width: 100%;
-		height: 185rpx;
+		height: 90rpx;
+		padding: 0 10rpx;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		overflow: hidden;
+		// border: 1px solid #ccc;
+		overflow: hidden;
 
-		.t {
-			font-size: 23rpx;
-			line-height: 1.6rem;
-			font-weight: 400;
+		.nav-item-l {
+			display: flex;
+			gap: 15rpx;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+
+			.logo-img {
+				width: 68rpx;
+				height: 68rpx;
+				overflow: hidden;
+			}
+
+			.name {
+				font-weight: bold;
+				font-size: 32rpx;
+				letter-spacing: 0.001rem;
+			}
 		}
 
-		.go-color {
-			color: #dd9734;
-		}
-
-		.card-t {
+		.nav-item-r {
 			display: flex;
 			flex-direction: row;
-			justify-content: flex-start;
+			justify-content: center;
 			align-items: center;
-			gap: 0;
+			gap: 34rpx;
 
-			.jiantou-right {
-				position: relative;
-				left: 5rpx;
+			.kf {
+				font-weight: b;
 			}
-			&:nth-child(2) {
+		}
+	}
+
+	.hd {
+		margin-top: 20rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 10rpx;
+
+		.card {
+			background-color: #fff;
+			padding: 20rpx 30rpx;
+			border-radius: 30rpx;
+			width: 100%;
+			height: 185rpx;
+
+			.t {
+				font-size: 23rpx;
+				line-height: 1.6rem;
+				font-weight: 400;
+			}
+
+			.go-color {
+				color: #dd9734;
+			}
+
+			.card-t {
 				display: flex;
+				flex-direction: row;
+				justify-content: flex-start;
 				align-items: center;
-				gap: 10rpx;
+				gap: 5px;
+				.yanjing {
+					color: #df1010;
+				}
+				.jiantou-right {
+					position: relative;
+					// left: 5rpx;
+				}
+				&:nth-child(2) {
+					display: flex;
+					align-items: center;
+					gap: 10rpx;
 
-				.t {
-					font-size: 35rpx;
-					font-weight: bold;
+					.t {
+						font-size: 35rpx;
+						font-weight: bold;
+					}
+
+					.money {
+						font-size: 42rpx;
+					}
+
+					.money-mini {
+						font-size: 34rpx;
+						font-weight: 800;
+					}
+
+					.money-fh {
+						font-size: 18rpx;
+					}
+				}
+			}
+		}
+
+		.left {
+			width: 56%;
+		}
+
+		.right {
+			flex: 1;
+			position: relative;
+
+			.dan {
+				position: absolute;
+				bottom: 20rpx;
+				right: 0rpx;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: flex-start;
+
+				.dan-img1 {
+					width: 70rpx;
+					height: 25rpx;
 				}
 
-				.money {
-					font-size: 42rpx;
+				.dan-img2 {
+					width: 90rpx;
+					height: 90rpx;
+					position: relative;
+					top: -5px;
 				}
 
-				.money-mini {
-					font-size: 34rpx;
-					font-weight: 800;
+				@keyframes rotate-bottom {
+					0%,
+					100% {
+						transform: rotate(0deg);
+					}
+
+					/* 初始/结束状态 */
+					50% {
+						transform: rotate(8deg);
+					}
+
+					/* 向右旋转15° */
+					25%,
+					75% {
+						transform: rotate(-8deg);
+					}
+
+					/* 向左旋转15° */
 				}
 
-				.money-fh {
-					font-size: 18rpx;
+				.rotating-image {
+					transform-origin: center bottom;
+					/* 旋转中心：底部中点 */
+					animation: rotate-bottom 1.5s infinite ease-in-out;
+					/* 动画配置 */
 				}
 			}
 		}
 	}
 
-	.left {
-		width: 56%;
-	}
+	.nav {
+		width: 100%;
+		height: auto;
+		padding: 0rpx;
+		margin-top: 15rpx;
 
-	.right {
-		flex: 1;
-		position: relative;
-
-		.dan {
-			position: absolute;
-			bottom: 20rpx;
-			right: 0rpx;
+		.nav-contain {
 			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: flex-start;
+			flex-direction: row;
+			justify-content: space-around;
+			align-items: center;
+			flex-wrap: wrap;
+			height: 380rpx;
+			background-color: #fff;
+			padding: 25rpx 0;
+			border-radius: 30rpx;
 
-			.dan-img1 {
-				width: 70rpx;
-				height: 25rpx;
-			}
+			.nav-item {
+				width: 150rpx;
+				height: 150rpx;
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				gap: 6rpx;
 
-			.dan-img2 {
-				width: 90rpx;
-				height: 90rpx;
-				position: relative;
-				top: -5px;
-			}
-
-			@keyframes rotate-bottom {
-				0%,
-				100% {
-					transform: rotate(0deg);
+				.nav-img {
+					width: 85rpx;
+					height: 85rpx;
 				}
 
-				/* 初始/结束状态 */
-				50% {
-					transform: rotate(8deg);
+				span {
+					font-size: 24rpx;
 				}
-
-				/* 向右旋转15° */
-				25%,
-				75% {
-					transform: rotate(-8deg);
-				}
-
-				/* 向左旋转15° */
-			}
-
-			.rotating-image {
-				transform-origin: center bottom;
-				/* 旋转中心：底部中点 */
-				animation: rotate-bottom 1.5s infinite ease-in-out;
-				/* 动画配置 */
 			}
 		}
-	}
-}
 
-.nav {
-	width: 100%;
-	height: auto;
-	padding: 0rpx;
-	margin-top: 15rpx;
-
-	.nav-contain {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-		align-items: center;
-		flex-wrap: wrap;
-		height: 380rpx;
-		background-color: #fff;
-		padding: 25rpx 0;
-		border-radius: 30rpx;
-
-		.nav-item {
-			width: 150rpx;
-			height: 150rpx;
-			text-align: center;
+		.point {
+			width: 100%;
+			height: 18px;
+			// background-color: #dd9734;
 			display: flex;
-			flex-direction: column;
+			flex-direction: row;
 			justify-content: center;
 			align-items: center;
-			gap: 6rpx;
+			gap: 5rpx;
 
-			.nav-img {
-				width: 85rpx;
-				height: 85rpx;
+			.p-black {
+				width: 16rpx;
+				height: 7rpx;
+				background-color: #4f4e4e;
+				border-radius: 80rpx;
 			}
 
-			span {
-				font-size: 24rpx;
+			.p-cc {
+				background-color: #ccc;
+				width: 10rpx;
+				height: 7rpx;
+				border-radius: 50%;
 			}
-		}
-	}
-
-	.point {
-		width: 100%;
-		height: 18px;
-		// background-color: #dd9734;
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-		gap: 5rpx;
-
-		.p-black {
-			width: 16rpx;
-			height: 7rpx;
-			background-color: #4f4e4e;
-			border-radius: 80rpx;
-		}
-
-		.p-cc {
-			background-color: #ccc;
-			width: 10rpx;
-			height: 7rpx;
-			border-radius: 50%;
 		}
 	}
 }
-
-.news {
+.section-two {
 	width: 100%;
-	padding-top: 220rpx;
-	position: relative;
-
+	height: 100vh;
+	position: absolute;
+	top: 760rpx;
+	left: 0;
+	z-index: 1;
+	// transition: padding-top 0.3s ease;
 	.background-layer {
 		position: absolute;
 		top: 0;
@@ -837,14 +972,14 @@ const tranTextStyle = computed(() => ({
 		&::after {
 			content: "";
 			position: absolute;
-			top: 0;
+			top: var(--after-top, 0);
 			left: 0;
 			width: 100%;
 			height: 100%;
 			background-size: 100% auto;
 			background-repeat: no-repeat;
 			background-position: center top;
-			transition: opacity 0.3s ease;
+			transition: opacity 0.3s ease, top 0.3s ease, background-image 0.3s ease;
 			background-image: var(--none-slice-image);
 			opacity: var(--none-slice-opacity);
 		}
@@ -853,20 +988,52 @@ const tranTextStyle = computed(() => ({
 	.new-contain {
 		position: relative;
 		z-index: 1;
-		padding: 33rpx 26rpx;
-
-		.t {
-			font-weight: bold;
-			font-size: 36rpx;
-			padding: 0 10rpx;
+		// padding: 40rpx 0;
+		.scroll-Y {
+			height: 500px;
+			.list {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+		}
+		.new-head {
+			width: 100%;
+			padding: 10rpx 46rpx;
+			.t {
+				font-weight: bold;
+				font-size: 36rpx;
+			}
+		}
+		.new-head2 {
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			padding: 10rpx 46rpx;
+			// position: fixed;
+			.t {
+				font-weight: bold;
+				font-size: 36rpx;
+			}
+			.current-m {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				.t-current-m {
+					font-weight: 300;
+					color: #737481;
+					font-size: 14px;
+				}
+			}
 		}
 
 		.card {
 			background-color: #fff;
-			width: 100%;
+			width: 90%;
 			height: auto;
 			border-radius: 30rpx;
-			margin-top: 10rpx;
 			margin-bottom: 15rpx;
 			padding: 20rpx 30rpx;
 
