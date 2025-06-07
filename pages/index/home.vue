@@ -119,7 +119,7 @@
 			</view>
 
 			<view class="section-two" :style="sectionTwoStyle">
-				<view class="background-layer" :style="backgroundStyle" ></view>
+				<view class="background-layer" :style="backgroundStyle"></view>
 				<view class="new-contain">
 					<view class="new-head" v-show="!isAtTop">
 						<span class="t"> 动态 </span>
@@ -309,7 +309,7 @@
 			</view>
 		</view>
 
-		<tabbar />
+		<!-- <tabbar /> -->
 	</cl-page>
 </template>
 
@@ -321,15 +321,16 @@ import { dzhStore } from "/@/dzh";
 
 const logoSrc = ref("/static/3156/logo.png");
 const { setting } = dzhStore();
-
+uni.hideTabBar();
 const viewportHeight = ref(uni.getSystemInfoSync().windowHeight);
 const viewportWidth = ref(uni.getSystemInfoSync().windowWidth);
+
 
 const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
 const isAnimating = ref(false);
 const UP_THRESHOLD = 10; // 上滑阈值
-const DOWN_THRESHOLD = 10; // 下滑阈值
+const DOWN_THRESHOLD = 5; // 下滑阈值
 const isAtTop = ref(false); // 是否在顶部位置
 
 // 计算section-two的初始位置到顶部的距离
@@ -346,12 +347,13 @@ const backgroundOpacity = computed(() => {
 	return Math.min(1, Math.max(0, progress));
 });
 
-const sectionStyle = computed(() => ({
-	transform: `translateY(${currentOffset.value}px)`,
-	transition: isAnimating.value ? "transform 0.3s ease" : "none",
-	willChange: "transform",
+// 添加 section-one 的样式计算属性
+const sectionOneStyle = computed(() => ({
+	opacity: isAtTop.value ? 0 : 1, // 只在到达顶部时完全透明
+	transition: "opacity 0.3s ease",
+ 
 }));
-
+ 
 // 背景图片样式
 const backgroundStyle = computed(() => ({
 	opacity: 1,
@@ -362,21 +364,17 @@ const backgroundStyle = computed(() => ({
 	"--none-slice-image": isAtTop.value
 		? "url(/static/3156/img/slice-end.png)"
 		: "url(/static/3156/img/none-slice.png)",
-	"--after-top": isAtTop.value ? "3.75rem" : "0",
+	// "--after-top": isAtTop.value ? "3.75rem" : "0",
 }));
 
-// 添加 section-one 的样式计算属性
-const sectionOneStyle = computed(() => ({
-	opacity: isAtTop.value ? 0 : 1, // 只在到达顶部时完全透明
-	transition: "opacity 0.3s ease",
-}));
+
 
 // 添加 section-two 的样式计算属性
 const sectionTwoStyle = computed(() => ({
 	transform: `translateY(${currentOffset.value}px)`,
 	transition: isAnimating.value ? "transform 0.3s ease" : "none",
 	willChange: "transform",
-	paddingTop:  "220rpx",
+	paddingTop: "6.5rem",
 }));
 
 const state = reactive({
@@ -397,7 +395,7 @@ const rpx2px = (value: number) => {
 const px2rpx = (value: number) => {
 	return (value * 750) / state.screenWidth;
 };
-
+// 水滴效果按钮圆
 const mainButtonStyle = computed(() => ({
 	transform: `translate(${px2rpx(state.currentX) - 60}rpx, ${
 		px2rpx(state.currentY) - 60
@@ -405,10 +403,11 @@ const mainButtonStyle = computed(() => ({
 	transition: state.isDragging ? "none" : "",
 }));
 
+// 水滴效果小圆点
 const originPointStyle = computed(() => ({
 	transform: `translate(${px2rpx(state.originX) - 30}rpx, ${px2rpx(state.originY) - 30}rpx)`,
 }));
-
+// 水滴容器
 const connectionStyle = computed(() => {
 	const dx = state.currentX - state.originX;
 	const dy = state.currentY - state.originY;
@@ -422,10 +421,12 @@ const connectionStyle = computed(() => {
 	};
 });
 
+// 水滴长度
 const distance = computed(() => {
 	return Number(connectionStyle.value.width.replace("rpx", ""));
 });
 
+// 水滴液化svg效果
 const connectSvgIcon = computed(() => {
 	// 这段代码是动态生成一个SVG图标，并将其转换为base64编码的数据URL
 	const width = rpx2px(Math.ceil(distance.value * 100) / 100); // 将rpx单位的距离转换为px，并四舍五入到两位小数
@@ -444,7 +445,7 @@ const connectSvgIcon = computed(() => {
 	// 将SVG转换为base64编码的数据URL，可以直接用于img标签的src属性
 	return `data:image/svg+xml;base64,${btoa(svg)}`;
 });
-
+// 按钮svg图标
 const tranGuidSvgIcon = computed(() => {
 	const svg = `
 		<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48">
@@ -454,7 +455,7 @@ const tranGuidSvgIcon = computed(() => {
 		`;
 	return `data:image/svg+xml;base64,${btoa(svg)}`;
 });
-
+// 按钮文字
 const tranTextWrapperStyle = computed(() => {
 	return {
 		opacity: 1 - Math.min(distance.value / 10, 1),
@@ -465,8 +466,7 @@ const initPosition = () => {
 	const { screenWidth, screenHeight } = uni.getSystemInfoSync();
 	state.screenWidth = screenWidth;
 	state.originX = (screenWidth / 5) * 4.2;
-	// state.originY = screenHeight / 1.68;
-	state.originY = 470;
+	state.originY = 500;
 	state.currentX = state.originX;
 	state.currentY = state.originY;
 };
@@ -533,6 +533,8 @@ const windowResizeCallback = () => {
 	}
 };
 
+
+// 首页下部分滚动
 const scrollTop = ref(0);
 const old = ref({
 	scrollTop: 0,
@@ -551,6 +553,10 @@ const scroll = (e: any) => {
 onMounted(() => {
 	initPosition();
 	uni.onWindowResize(windowResizeCallback);
+	console.log('Screen width:', viewportWidth.value);
+	console.log('Initial top distance (rpx):', INITIAL_TOP_DISTANCE);
+	console.log('Initial top distance (px):', INITIAL_TOP_DISTANCE_PX);
+	console.log('TOP_POSITION:', TOP_POSITION);
 });
 
 onBeforeUnmount(() => {
@@ -568,6 +574,7 @@ const handleTouchMove = (e: TouchEvent) => {
 
 	const deltaY = e.touches[0].clientY - touchStartY.value;
 	const nextOffset = currentOffset.value + deltaY;
+	currentOffset.value = nextOffset;
 
 	// 限制滑动范围
 	if (nextOffset >= INITIAL_POSITION) {
@@ -609,12 +616,14 @@ const handleTouchEnd = () => {
 	isAnimating.value = true;
 	const deltaY = currentOffset.value - INITIAL_POSITION;
 
-	if (isAtTop.value && deltaY > 5) {
+	if (isAtTop.value && deltaY > DOWN_THRESHOLD) {
 		// 在顶部下滑超过5px，回到初始位置
 		currentOffset.value = INITIAL_POSITION;
 		isAtTop.value = false;
-	} else if (!isAtTop.value && Math.abs(deltaY) > 10 && deltaY < 0) {
+	} else if (!isAtTop.value && Math.abs(deltaY) > UP_THRESHOLD && deltaY < 0) {
 		// 上滑超过10px，吸附到顶部
+		console.log("TOP_POSITION",TOP_POSITION);
+		
 		currentOffset.value = TOP_POSITION;
 		isAtTop.value = true;
 	} else if (!isAtTop.value) {
@@ -690,8 +699,7 @@ const tranTextStyle = computed(() => ({
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	// padding: 30rpx 26rpx 0 26rpx;
-	padding-top: 30rpx;
+	transform: translateZ(0); // 创建新的层叠上下文
 }
 
 .numFont {
@@ -705,7 +713,9 @@ const tranTextStyle = computed(() => ({
 	transition: opacity 0.3s ease;
 	will-change: opacity;
 	width: 90%;
-
+	// border: 2px solid #dd9734;
+	padding-top: 0.7rem;
+	// display: none;
 	.head {
 		width: 100%;
 		height: 90rpx;
@@ -940,11 +950,13 @@ const tranTextStyle = computed(() => ({
 .section-two {
 	width: 100%;
 	height: 100vh;
-	position: absolute;
-	top: 760rpx;
+	position: absolute; // 改为fixed定位
+	top: 435px;
 	left: 0;
 	z-index: 1;
-	// transition: padding-top 0.3s ease;
+	overflow: hidden;
+	transform: translateZ(0); // 创建新的层叠上下文
+	transition: padding-top 0.3s ease;
 	.background-layer {
 		position: absolute;
 		top: 0;
@@ -988,7 +1000,6 @@ const tranTextStyle = computed(() => ({
 	.new-contain {
 		position: relative;
 		z-index: 1;
-		// padding: 40rpx 0;
 		.scroll-Y {
 			height: 500px;
 			.list {
