@@ -119,27 +119,59 @@
 			</view>
 
 			<view class="section-two" :style="sectionTwoStyle">
-				<view class="background-layer" :style="backgroundStyle"></view>
-				<view class="new-contain">
-					<view class="new-head" v-show="!isAtTop">
-						<span class="t"> 动态 </span>
+				<scroll-view
+					:scroll-top="scrollTop"
+					:scroll-y="isAtTop"
+					class="scroll-Y"
+					@scrolltoupper="upper"
+					@scrolltolower="lower"
+					@scroll="scroll"
+				>
+					<view class="background-layer" :style="backgroundStyle"> </view>
+					<view class="top-nav">
+						<view class="nav-list">
+							<view class="nav-item">
+								<span>全部</span>
+							</view>
+
+							<view class="nav-item" v-for="(item, index) in navItems" :key="index">
+								<image :src="item.img" mode="aspectFit" class="new-img" />
+								<span>{{ item.name }}</span>
+								<view v-if="index === navItems.length - 1" class="blur-mask"></view>
+							</view>
+						</view>
+						<!-- <span class="test"> 测试文字测试文字测试文字测试文字测试测试文字 </span> -->
 					</view>
 
-					<scroll-view
-						:scroll-top="scrollTop"
-						:scroll-y="isAtTop"
-						class="scroll-Y"
-						@scrolltoupper="upper"
-						@scrolltolower="lower"
-						@scroll="scroll"
-					>
-						<view class="list">
-							<view class="top-title" v-show="isAtTop">
-								<span class="t-current-m">动态 - 全部</span>
+					<view class="top-title" :style="topTitle">
+						<span class="t-all">动态 - 全部 </span>
+						<view class="top-head">
+							<view class="current-m">
+								<span class="t-current-m">{{ topName }}</span>
+								<uni-icons
+									custom-prefix="iconfont-3156"
+									type="icon-sanjiaoxing_xiangxia"
+									size="12"
+									color="#737481"
+								></uni-icons>
 							</view>
-							<view class="new-head2" v-show="isAtTop">
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-shaixuan-F"
+								size="20"
+								color="#737481"
+							></uni-icons>
+						</view>
+					</view>
+
+					<view class="new-contain">
+						<view class="new-head" v-show="!isAtTop">
+							<span class="t"> 动态 </span>
+						</view>
+						<view class="list">
+							<view class="top-head list-head" v-show="isAtTop">
 								<view class="current-m">
-									<span class="t-current-m">本月</span>
+									<span class="t-current-m">{{ topNameArray[0] }}</span>
 									<uni-icons
 										custom-prefix="iconfont-3156"
 										type="icon-sanjiaoxing_xiangxia"
@@ -158,7 +190,7 @@
 							<view class="card">
 								<view class="title">
 									<u-icon name="bell-fill" color="#f2c342" size="36"></u-icon>
-									<text class="t-h">消息(+14) [{{ isAtTop }}]</text>
+									<text class="t-h">消息(+14)</text>
 								</view>
 								<view class="con">
 									<view class="left">
@@ -196,6 +228,12 @@
 								</view>
 							</view>
 
+							<view class="top-head list-head" v-show="isAtTop">
+								<view class="current-m">
+									<span class="t-current-m">{{ topNameArray[1] }}</span>
+								</view>
+							</view>
+
 							<view class="card">
 								<view class="con">
 									<view class="left">
@@ -215,7 +253,6 @@
 							<view class="ad">
 								<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
 							</view>
-
 							<view class="card">
 								<view class="con">
 									<view class="left">
@@ -232,32 +269,63 @@
 								</view>
 							</view>
 
+							<view class="top-head list-head" v-show="isAtTop">
+								<view class="current-m">
+									<span class="t-current-m">{{ topNameArray[2] }}</span>
+								</view>
+							</view>
+
 							<view class="ad">
 								<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
 							</view>
 
-							<view class="new-head2" v-show="isAtTop">
-								<view class="current-m">
-									<span class="t-current-m">本月</span>
-									<uni-icons
-										custom-prefix="iconfont-3156"
-										type="icon-sanjiaoxing_xiangxia"
-										size="15"
-										color="#737481"
-									></uni-icons>
+							<view class="card">
+								<view class="con">
+									<view class="left">
+										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
+									</view>
+									<view class="right">
+										<view class="title jiangli">
+											<text>签到成功</text>
+										</view>
+										<view class="con">
+											<text>5月7日 11:34</text>
+										</view>
+									</view>
 								</view>
-								<uni-icons
-									custom-prefix="iconfont-3156"
-									type="icon-shaixuan-F"
-									size="20"
-									color="#737481"
-								></uni-icons>
+							</view>
+							<view class="ad">
+								<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
+							</view>
+							<view class="ad">
+								<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
+							</view>
+
+							<view class="card">
+								<view class="con">
+									<view class="left">
+										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
+									</view>
+									<view class="right">
+										<view class="title jiangli">
+											<text>签到成功</text>
+										</view>
+										<view class="con">
+											<text>5月7日 11:34</text>
+										</view>
+									</view>
+								</view>
+							</view>
+							<view class="ad">
+								<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
+							</view>
+							<view class="ad">
+								<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
 							</view>
 						</view>
-					</scroll-view>
-				</view>
+					</view>
+				</scroll-view>
 			</view>
-
 			<view
 				class="tran container"
 				:class="[{ active: state.isDragging, completed: state.completed }]"
@@ -325,7 +393,6 @@ uni.hideTabBar();
 const viewportHeight = ref(uni.getSystemInfoSync().windowHeight);
 const viewportWidth = ref(uni.getSystemInfoSync().windowWidth);
 
-
 const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
 const isAnimating = ref(false);
@@ -333,8 +400,14 @@ const UP_THRESHOLD = 10; // 上滑阈值
 const DOWN_THRESHOLD = 5; // 下滑阈值
 const isAtTop = ref(false); // 是否在顶部位置
 
+let appTop = 0; // section-two的初始top值（rpx）
+// #ifdef APP
+// 根据平台调整高度比例
+appTop = 90;
+// #endif
+
 // 计算section-two的初始位置到顶部的距离
-const INITIAL_TOP_DISTANCE = 760; // section-two的初始top值（rpx）
+const INITIAL_TOP_DISTANCE = 760 - appTop; // section-two的初始top值（rpx）
 const INITIAL_TOP_DISTANCE_PX = (INITIAL_TOP_DISTANCE * viewportWidth.value) / 750; // 转换为px
 
 // 修改TOP_POSITION的计算方式，确保不会超过初始位置
@@ -351,9 +424,8 @@ const backgroundOpacity = computed(() => {
 const sectionOneStyle = computed(() => ({
 	opacity: isAtTop.value ? 0 : 1, // 只在到达顶部时完全透明
 	transition: "opacity 0.3s ease",
- 
 }));
- 
+
 // 背景图片样式
 const backgroundStyle = computed(() => ({
 	opacity: 1,
@@ -364,17 +436,13 @@ const backgroundStyle = computed(() => ({
 	"--none-slice-image": isAtTop.value
 		? "url(/static/3156/img/slice-end.png)"
 		: "url(/static/3156/img/none-slice.png)",
-	// "--after-top": isAtTop.value ? "3.75rem" : "0",
 }));
-
-
 
 // 添加 section-two 的样式计算属性
 const sectionTwoStyle = computed(() => ({
 	transform: `translateY(${currentOffset.value}px)`,
 	transition: isAnimating.value ? "transform 0.3s ease" : "none",
 	willChange: "transform",
-	paddingTop: "6.5rem",
 }));
 
 const state = reactive({
@@ -385,7 +453,7 @@ const state = reactive({
 	isDragging: false,
 	maxDistance: 160,
 	completed: false,
-	screenWidth: 375,
+	screenWidth: 0,
 });
 
 const rpx2px = (value: number) => {
@@ -463,10 +531,19 @@ const tranTextWrapperStyle = computed(() => {
 });
 
 const initPosition = () => {
-	const { screenWidth, screenHeight } = uni.getSystemInfoSync();
+	const { screenWidth, windowHeight } = uni.getSystemInfoSync();
 	state.screenWidth = screenWidth;
 	state.originX = (screenWidth / 5) * 4.2;
-	state.originY = 500;
+	let heightRatio = 0;
+	// #ifdef APP
+	// 根据平台调整高度比例
+	heightRatio = 0.59;
+	// #endif
+	// #ifndef APP
+	// 根据平台调整高度比例
+	heightRatio = 0.55;
+	// #endif
+	state.originY = windowHeight * heightRatio;
 	state.currentX = state.originX;
 	state.currentY = state.originY;
 };
@@ -521,47 +598,68 @@ const onTouchEnd = () => {
 	}
 };
 
-// 监听屏幕尺寸变化
-const windowResizeCallback = () => {
-	viewportHeight.value = uni.getSystemInfoSync().windowHeight;
-	viewportWidth.value = uni.getSystemInfoSync().windowWidth;
-	// 重新计算TOP_POSITION
-	const newTopPosition = -(INITIAL_TOP_DISTANCE * viewportWidth.value) / 750;
-	// 如果当前在顶部，更新位置
-	if (isAtTop.value) {
-		currentOffset.value = newTopPosition;
-	}
-};
-
-
 // 首页下部分滚动
-const scrollTop = ref(0);
-const old = ref({
-	scrollTop: 0,
+const topTitle = computed(() => {
+	return {
+		display: showTopTile.value ? "flex" : "none",
+	};
 });
+const scrollTop = ref(0);
+const showTopTile = ref(false);
+const topName = ref("");
+const topNameArray = reactive(["本月", "5月", "4月"]);
+// 添加滚动事件处理函数
 const upper = (e: any) => {
 	console.log("滚动到顶部");
 };
+
 const lower = (e: any) => {
 	console.log("滚动到底部");
 };
+
 const scroll = (e: any) => {
-	// console.log(e);
-	old.value.scrollTop = e.detail.scrollTop;
+	const currentScrollTop = e.detail.scrollTop;
+	scrollTop.value = currentScrollTop;
+
+	// 实时获取所有 list-head 元素的位置
+	uni
+		.createSelectorQuery()
+		.selectAll(".list-head")
+		.boundingClientRect((data: any) => {
+			if (data) {
+				let arr: number[] = [];
+				// 检查是否所有元素都在阈值之上
+				const allAboveThreshold = data.every((item: any) => item.top > rpx2px(70));
+				if (allAboveThreshold) {
+					showTopTile.value = false;
+				} else {
+					// 找到到达顶部的最大索引
+					let maxIndex = -1;
+					data.forEach((item: any, index: number) => {
+						if (item.top <= rpx2px(70 + appTop)) {
+							maxIndex = Math.max(maxIndex, index);
+							showTopTile.value = true;
+							arr.push(index);
+						}
+					});
+
+					// 如果找到了到达顶部的元素，获取其文本内容
+					if (maxIndex !== -1) {
+						topName.value = topNameArray[maxIndex];
+						console.log("topName", topName.value);
+					}
+				}
+			}
+		})
+		.exec();
 };
 
 onMounted(() => {
 	initPosition();
-	uni.onWindowResize(windowResizeCallback);
-	console.log('Screen width:', viewportWidth.value);
-	console.log('Initial top distance (rpx):', INITIAL_TOP_DISTANCE);
-	console.log('Initial top distance (px):', INITIAL_TOP_DISTANCE_PX);
-	console.log('TOP_POSITION:', TOP_POSITION);
+ 
 });
 
-onBeforeUnmount(() => {
-	uni.offWindowResize(windowResizeCallback);
-});
+onBeforeUnmount(() => {});
 
 const handleTouchStart = (e: TouchEvent) => {
 	if (isAnimating.value) return;
@@ -574,7 +672,6 @@ const handleTouchMove = (e: TouchEvent) => {
 
 	const deltaY = e.touches[0].clientY - touchStartY.value;
 	const nextOffset = currentOffset.value + deltaY;
-	currentOffset.value = nextOffset;
 
 	// 限制滑动范围
 	if (nextOffset >= INITIAL_POSITION) {
@@ -588,7 +685,7 @@ const handleTouchMove = (e: TouchEvent) => {
 	}
 
 	// section-two专用吸附逻辑
-	if (!isAtTop.value && deltaY < -10) {
+	if (!isAtTop.value && Math.abs(deltaY) > UP_THRESHOLD) {
 		// 上滑超过10px，吸附到顶部
 		isAnimating.value = true;
 		currentOffset.value = TOP_POSITION;
@@ -597,7 +694,7 @@ const handleTouchMove = (e: TouchEvent) => {
 			isAnimating.value = false;
 		}, 300);
 	}
-	if (isAtTop.value && deltaY > 5) {
+	if (isAtTop.value && deltaY > DOWN_THRESHOLD) {
 		// 在顶部下滑超过5px，回到初始位置
 		isAnimating.value = true;
 		currentOffset.value = INITIAL_POSITION;
@@ -622,8 +719,6 @@ const handleTouchEnd = () => {
 		isAtTop.value = false;
 	} else if (!isAtTop.value && Math.abs(deltaY) > UP_THRESHOLD && deltaY < 0) {
 		// 上滑超过10px，吸附到顶部
-		console.log("TOP_POSITION",TOP_POSITION);
-		
 		currentOffset.value = TOP_POSITION;
 		isAtTop.value = true;
 	} else if (!isAtTop.value) {
@@ -649,7 +744,6 @@ const tranStyle = computed(() => ({
 
 // tran 按钮移动相关状态
 const tranCurrentY = ref(0);
-
 // tran 文本透明度计算
 const tranTextOpacity = computed(() => {
 	const progress = Math.abs(tranCurrentY.value) / 20;
@@ -660,6 +754,14 @@ const tranTextStyle = computed(() => ({
 	opacity: tranTextOpacity.value,
 	transition: "opacity 0.3s ease",
 }));
+
+const navItems = ref([
+	{ img: "/static/3156/img/card-icon.png", name: "ZA Card" },
+	{ img: "/static/3156/img/zhuan-icon.png", name: "转账" },
+	{ img: "/static/3156/img/cun-icon.png", name: "存款" },
+	{ img: "/static/3156/img/baoxian-icon.png", name: "保险" },
+	{ img: "/static/3156/img/jijin-icon.png", name: "基金" },
+]);
 </script>
 
 <style scoped>
@@ -699,12 +801,20 @@ const tranTextStyle = computed(() => ({
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	transform: translateZ(0); // 创建新的层叠上下文
+	// transform: translateZ(0); // 创建新的层叠上下文
 }
 
 .numFont {
 	font-family: "number-3156" !important;
 	letter-spacing: 0.001rem;
+}
+.scroll-Y {
+	height: 100vh;
+	-webkit-overflow-scrolling: touch;
+	overflow-y: auto;
+	position: relative;
+	transform: translateZ(0);
+	will-change: transform;
 }
 .section-one {
 	height: 760rpx;
@@ -951,19 +1061,17 @@ const tranTextStyle = computed(() => ({
 	width: 100%;
 	height: 100vh;
 	position: absolute; // 改为fixed定位
-	top: 435px;
+	top: 760rpx;
 	left: 0;
 	z-index: 1;
 	overflow: hidden;
-	transform: translateZ(0); // 创建新的层叠上下文
-	transition: padding-top 0.3s ease;
 	.background-layer {
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		z-index: 0;
+		z-index: 10;
 		pointer-events: none;
 
 		&::before {
@@ -996,18 +1104,115 @@ const tranTextStyle = computed(() => ({
 			opacity: var(--none-slice-opacity);
 		}
 	}
-
-	.new-contain {
-		position: relative;
-		z-index: 1;
-		.scroll-Y {
-			height: 500px;
-			.list {
-				width: 100%;
+	.top-nav {
+		width: 98%;
+		position: absolute;
+		top: 90rpx;
+		z-index: 11;
+		overflow: hidden;
+		height: 90rpx;
+		.nav-list {
+			width: 108%;
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-start;
+			position: relative;
+			.nav-item {
+				width: 160rpx;
+				height: 90rpx;
 				display: flex;
 				flex-direction: column;
+				justify-content: space-between;
 				align-items: center;
+				position: relative;
+				.new-img {
+					width: 40rpx;
+					height: 40rpx;
+				}
+				&:first-child {
+					justify-content: end;
+					span {
+						font-weight: 400;
+						color: #000;
+					}
+				}
+				&:last-child {
+					.new-img,
+					span {
+						position: relative;
+						&::after {
+							content: "";
+							position: absolute;
+							right: 0;
+							top: 0;
+							width: 280%;
+							height: 100%;
+							background: linear-gradient(
+								90deg,
+								rgba(0, 0, 0, 0) 30%,
+								rgb(57, 229, 177,0.9) 90%,
+								rgb(57, 229, 177,1) 100%
+							);
+							filter: blur(4px);
+							-webkit-filter: blur(4px);
+							pointer-events: none;
+						}
+					}
+				}
 			}
+		}
+	}
+	.top-title {
+		width: 100%;
+		position: fixed;
+		height: 120rpx;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		background-color: #f5f5fc;
+		z-index: 12;
+		.t-all {
+			line-height: 60rpx;
+		}
+	}
+	.top-head {
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 46rpx;
+
+		.t {
+			font-weight: bold;
+			font-size: 36rpx;
+		}
+		.current-m {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			.t-current-m {
+				font-weight: 300;
+				color: #737481;
+				font-size: 14px;
+			}
+		}
+	}
+	.new-contain {
+		width: 100%;
+		position: relative;
+		z-index: 11;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding-top: 200rpx;
+		.list {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
 		}
 		.new-head {
 			width: 100%;
@@ -1017,27 +1222,8 @@ const tranTextStyle = computed(() => ({
 				font-size: 36rpx;
 			}
 		}
-		.new-head2 {
-			width: 100%;
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			padding: 10rpx 46rpx;
-			// position: fixed;
-			.t {
-				font-weight: bold;
-				font-size: 36rpx;
-			}
-			.current-m {
-				display: flex;
-				align-items: center;
-				gap: 10px;
-				.t-current-m {
-					font-weight: 300;
-					color: #737481;
-					font-size: 14px;
-				}
-			}
+		.list-head {
+			height: 100rpx;
 		}
 
 		.card {
@@ -1047,7 +1233,7 @@ const tranTextStyle = computed(() => ({
 			border-radius: 30rpx;
 			margin-bottom: 15rpx;
 			padding: 20rpx 30rpx;
-
+			z-index: 1;
 			.title {
 				display: flex;
 				flex-direction: row;
@@ -1114,7 +1300,7 @@ const tranTextStyle = computed(() => ({
 		}
 
 		.ad {
-			width: 100%;
+			width: 90%;
 			height: 210rpx;
 			text-align: center;
 			margin: 15rpx 0;
@@ -1129,8 +1315,8 @@ const tranTextStyle = computed(() => ({
 
 .tran {
 	position: absolute;
-	right: 50rpx;
-	top: 820rpx;
+	// right: 50rpx;
+	// top: 820rpx;
 	z-index: 1;
 	will-change: opacity;
 
