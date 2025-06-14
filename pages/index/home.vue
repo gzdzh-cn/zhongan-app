@@ -1,411 +1,576 @@
 <template>
-	<cl-page backgroundColor="#f5f5fc">
-		<view
-			class="main"
-			ref="container"
-			@touchstart="handleTouchStart"
-			@touchmove="handleTouchMove"
-			@touchend="handleTouchEnd"
-		>
-			<view class="section-one" :style="sectionOneStyle">
-				<!-- logo -->
-				<view class="head">
-					<view class="nav-item-l">
-						<image :src="logoSrc" mode="aspectFit" class="logo-img" />
-						<span class="name">Hi, Czy<text class="name numFont">666999</text></span>
-					</view>
-
-					<view class="nav-item-r">
-						<uni-icons
-							custom-prefix="iconfont-3156"
-							type="icon-kefu"
-							size="30"
-							class="kf"
-						></uni-icons>
-						<uni-icons
-							custom-prefix="iconfont-3156"
-							type="icon-erweima"
-							size="26"
-							class="qrcode"
-						></uni-icons>
-					</view>
-				</view>
-
-				<!-- 余额 -->
-				<view class="hd">
-					<view class="card left">
-						<view class="card-t">
-							<text class="t"> 总结余 (HKD等值)</text>
-							<uni-icons
-								custom-prefix="iconfont-3156"
-								type="icon-yanjing2"
-								size="17"
-								class="yanjing"
-							></uni-icons>
-						</view>
-						<view class="card-t">
-							<text class="t numFont money">106<text class="numFont money-mini">.00</text></text>
-							<u-icon name="arrow-right" color="#5b5c66" size="18" class="jiantou-right"></u-icon>
-						</view>
-						<view class="card-t">
-							<text class="t"> 活期存款 <text class="numFont">106.00 </text></text>
-						</view>
-					</view>
-
-					<view class="card right">
-						<view class="c-l">
-							<view class="card-t">
-								<text class="t"> ZA Quest </text>
-							</view>
-							<view class="card-t">
-								<text class="t"> 签到有奖</text>
-							</view>
-							<view class="card-t">
-								<text class="t go-color"> Go > </text>
-							</view>
-						</view>
-						<view class="dan">
-							<image src="/static/3156//img/dan1.png" mode="aspectFit" class="dan-img1" />
-							<image
-								src="/static/3156//img/dan2.png"
-								mode="aspectFit"
-								class="dan-img2 rotating-image"
-							/>
-						</view>
-					</view>
-				</view>
-
-				<!-- 导航 -->
-				<view class="nav">
-					<view class="nav-contain">
-						<view class="nav-item">
-							<image src="/static//3156//img/n1.png" mode="aspectFit" class="nav-img" />
-							<text>存款</text>
-						</view>
-						<view class="nav-item">
-							<image src="/static//3156//img/n2.png" mode="aspectFit" class="nav-img" />
-							<text>保险</text>
-						</view>
-						<view class="nav-item">
-							<image src="/static//3156//img/n3.png" mode="aspectFit" class="nav-img" />
-							<text>账户信息</text>
-						</view>
-						<view class="nav-item">
-							<image src="/static//3156//img/n4.png" mode="aspectFit" class="nav-img" />
-							<text>钱罐</text>
-						</view>
-						<view class="nav-item">
-							<image src="/static//3156//img/n5.png" mode="aspectFit" class="nav-img" />
-							<text>海外汇款</text>
-						</view>
-						<view class="nav-item">
-							<image src="/static//3156//img/n6.png" mode="aspectFit" class="nav-img" />
-							<text>推荐好友</text>
-						</view>
-						<view class="nav-item">
-							<image src="/static//3156//img/n7.png" mode="aspectFit" class="nav-img" />
-							<text>最劲抽</text>
-						</view>
-						<view class="nav-item">
-							<image src="/static//3156//img/n8.png" mode="aspectFit" class="nav-img" />
-							<text>全部</text>
-						</view>
-					</view>
-					<view class="point">
-						<view class="p-black"></view>
-						<view class="p-cc"></view>
-					</view>
-				</view>
-			</view>
-
-			<view class="section-two" :style="sectionTwoStyle">
-				<scroll-view
-					:scroll-top="scrollTop"
-					:scroll-y="isAtTop"
-					class="scroll-Y"
-					@scrolltoupper="upper"
-					@scrolltolower="lower"
-					@scroll="scroll"
-				>
-					<view class="background-layer" :style="backgroundStyle"> </view>
-					<view class="top-nav">
-						<view class="nav-list">
-							<view class="nav-item">
-								<span>全部</span>
-							</view>
-
-							<view class="nav-item" v-for="(item, index) in navItems" :key="index">
-								<image :src="item.img" mode="aspectFit" class="new-img" />
-								<span>{{ item.name }}</span>
-								<view v-if="index === navItems.length - 1" class="blur-mask"></view>
-							</view>
-						</view>
-						<!-- <span class="test"> 测试文字测试文字测试文字测试文字测试测试文字 </span> -->
-					</view>
-
-					<view class="top-title" :style="topTitle">
-						<span class="t-all">动态 - 全部 </span>
-						<view class="top-head">
-							<view class="current-m">
-								<span class="t-current-m">{{ topName }}</span>
-								<uni-icons
-									custom-prefix="iconfont-3156"
-									type="icon-sanjiaoxing_xiangxia"
-									size="12"
-									color="#737481"
-								></uni-icons>
-							</view>
-							<uni-icons
-								custom-prefix="iconfont-3156"
-								type="icon-shaixuan-F"
-								size="20"
-								color="#737481"
-							></uni-icons>
-						</view>
-					</view>
-
-					<view class="new-contain">
-						<view class="new-head" v-show="!isAtTop">
-							<span class="t"> 动态 </span>
-						</view>
-						<view class="list">
-							<view class="top-head list-head" v-show="isAtTop">
-								<view class="current-m">
-									<span class="t-current-m">{{ topNameArray[0] }}</span>
-									<uni-icons
-										custom-prefix="iconfont-3156"
-										type="icon-sanjiaoxing_xiangxia"
-										size="12"
-										color="#737481"
-									></uni-icons>
-								</view>
-								<uni-icons
-									custom-prefix="iconfont-3156"
-									type="icon-shaixuan-F"
-									size="20"
-									color="#737481"
-								></uni-icons>
-							</view>
-
-							<view class="card">
-								<view class="title">
-									<u-icon name="bell-fill" color="#f2c342" size="36"></u-icon>
-									<text class="t-h">消息(+14)</text>
-								</view>
-								<view class="con">
-									<view class="left">
-										<image src="/static/3156/img/new-1.png" mode="aspectFit" class="new-img" />
-									</view>
-									<view class="right">
-										<view class="title">
-											<image
-												src="/static/3156/img/new-icon.png"
-												mode="aspectFit"
-												class="new-icon"
-											/>
-											<text>「最佳销售」基金排行榜更新了 </text>
-										</view>
-										<view class="con">
-											<text class="t-desc">查看过往3个月最受欢迎的基金。投资...</text>
-										</view>
-									</view>
-								</view>
-							</view>
-
-							<view class="card">
-								<view class="con">
-									<view class="left">
-										<image src="/static/3156/img/icon1.png" mode="aspectFit" class="new-img icon" />
-									</view>
-									<view class="right">
-										<view class="title jiangli">
-											<text>有2个新用户专属任务在等你！即刻做任务赚丰富奖...</text>
-										</view>
-										<view class="con">
-											<text>5月12日 13:20</text>
-										</view>
-									</view>
-								</view>
-							</view>
-
-							<view class="top-head list-head" v-show="isAtTop">
-								<view class="current-m">
-									<span class="t-current-m">{{ topNameArray[1] }}</span>
-								</view>
-							</view>
-
-							<view class="card">
-								<view class="con">
-									<view class="left">
-										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
-									</view>
-									<view class="right">
-										<view class="title jiangli">
-											<text>成功用新设备登录</text>
-										</view>
-										<view class="con">
-											<text>5月9日 00:35</text>
-										</view>
-									</view>
-								</view>
-							</view>
-
-							<view class="ad">
-								<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
-							</view>
-							<view class="card">
-								<view class="con">
-									<view class="left">
-										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
-									</view>
-									<view class="right">
-										<view class="title jiangli">
-											<text>签到成功</text>
-										</view>
-										<view class="con">
-											<text>5月7日 11:34</text>
-										</view>
-									</view>
-								</view>
-							</view>
-
-							<view class="top-head list-head" v-show="isAtTop">
-								<view class="current-m">
-									<span class="t-current-m">{{ topNameArray[2] }}</span>
-								</view>
-							</view>
-
-							<view class="ad">
-								<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
-							</view>
-
-							<view class="card">
-								<view class="con">
-									<view class="left">
-										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
-									</view>
-									<view class="right">
-										<view class="title jiangli">
-											<text>签到成功</text>
-										</view>
-										<view class="con">
-											<text>5月7日 11:34</text>
-										</view>
-									</view>
-								</view>
-							</view>
-							<view class="ad">
-								<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
-							</view>
-							<view class="ad">
-								<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
-							</view>
-
-							<view class="card">
-								<view class="con">
-									<view class="left">
-										<image src="/static/3156/img/icon2.png" mode="aspectFit" class="new-img icon" />
-									</view>
-									<view class="right">
-										<view class="title jiangli">
-											<text>签到成功</text>
-										</view>
-										<view class="con">
-											<text>5月7日 11:34</text>
-										</view>
-									</view>
-								</view>
-							</view>
-							<view class="ad">
-								<image src="/static/3156/img/ad1.png" mode="aspectFill" class="ad-img" />
-							</view>
-							<view class="ad">
-								<image src="/static/3156/img/ad2.jpg" mode="aspectFit" class="ad-img" />
-							</view>
-						</view>
-					</view>
-				</scroll-view>
-			</view>
+	<cl-page backgroundColor="#f6f5fa">
+		<view class="page-main">
+			<!-- 已登录 -->
 			<view
-				class="tran container"
-				:class="[{ active: state.isDragging, completed: state.completed }]"
-				:style="tranStyle"
+				v-show="hanLogin"
+				class="main"
+				ref="container"
+				@touchstart="handleTouchStart"
+				@touchmove="handleTouchMove"
+				@touchend="handleTouchEnd"
 			>
-				<view
-					v-show="state.isDragging"
-					class="main-btn origin-point"
-					:style="originPointStyle"
-				></view>
-				<view v-show="state.isDragging" class="connection-line" :style="connectionStyle">
-					<image :src="connectSvgIcon" mode="fill"></image>
+				<view class="section-one" :style="sectionOneStyle">
+					<!-- logo -->
+					<view class="head">
+						<view class="nav-item-l" @tap="logout">
+							<image :src="logoSrc" mode="aspectFit" class="logo-img" />
+							<span class="name"
+								>Hi, {{ userInfo.info?.username }}<text class="name numFont"></text
+							></span>
+						</view>
+
+						<view class="nav-item-r">
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-kefu"
+								size="30"
+								class="kf"
+							></uni-icons>
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-erweima"
+								size="26"
+								class="qrcode"
+							></uni-icons>
+						</view>
+					</view>
+
+					<!-- 余额 -->
+					<view class="hd">
+						<view class="card left">
+							<view class="card-t">
+								<text class="t"> 总结余 (HKD等值)</text>
+								<uni-icons
+									custom-prefix="iconfont-3156"
+									type="icon-yanjing2"
+									size="17"
+									class="yanjing"
+								></uni-icons>
+							</view>
+							<view class="card-t">
+								<text class="t numFont money"
+									>{{ formatNumber(Math.floor(depositAmount))
+									}}<text class="numFont money-mini"
+										>.{{ (depositAmount % 1).toFixed(2).slice(2) }}</text
+									></text
+								>
+								<u-icon name="arrow-right" color="#5b5c66" size="18" class="jiantou-right"></u-icon>
+							</view>
+							<view class="card-t">
+								<text class="t">
+									活期存款 <text class="numFont">{{ formatNumber(Math.floor(depositAmount)) }}</text
+									>.{{ (depositAmount % 1).toFixed(2).slice(2) }}</text
+								>
+							</view>
+						</view>
+
+						<view class="card right">
+							<view class="c-l">
+								<view class="card-t">
+									<text class="t"> ZA Quest </text>
+								</view>
+								<view class="card-t">
+									<text class="t"> 签到有奖</text>
+								</view>
+								<view class="card-t">
+									<text class="t go-color"> Go > </text>
+								</view>
+							</view>
+							<view class="dan">
+								<image src="/static/3156//img/dan1.png" mode="aspectFit" class="dan-img1" />
+								<image
+									src="/static/3156//img/dan2.png"
+									mode="aspectFit"
+									class="dan-img2 rotating-image"
+								/>
+							</view>
+						</view>
+					</view>
+
+					<!-- 导航 -->
+					<view class="nav">
+						<view class="nav-contain">
+							<view class="nav-item" v-for="(item, index) in navList" :key="index">
+								<image :src="item.img" mode="aspectFit" class="nav-img" />
+								<text class="nav-text">{{ item.text }}</text>
+							</view>
+						</view>
+						<view class="point">
+							<view class="p-black"></view>
+							<view class="p-cc"></view>
+						</view>
+					</view>
+				</view>
+
+				<view class="section-two" :style="sectionTwoStyle">
+					<scroll-view
+						:scroll-top="scrollTop"
+						:scroll-y="isAtTop"
+						class="scroll-Y"
+						@scrolltoupper="upper"
+						@scrolltolower="lower"
+						@scroll="scroll"
+					>
+						<view class="background-layer" :style="backgroundStyle"> </view>
+						<view class="top-nav" v-show="isAtTop">
+							<view class="nav-list">
+								<view class="nav-item">
+									<text>全部</text>
+								</view>
+
+								<view class="nav-item" v-for="(item, index) in navItems" :key="index">
+									<image :src="item.img" mode="aspectFit" class="new-img" />
+									<text class="nav-text">{{ item.name }}</text>
+									<view v-if="index === navItems.length - 1" class="blur-mask"></view>
+								</view>
+							</view>
+						</view>
+
+						<view class="top-title" :style="topTitle">
+							<text class="t-all">动态 - 全部</text>
+						</view>
+
+						<view class="new-contain" :style="newContainStyle">
+							<view class="new-head" v-show="!isAtTop">
+								<text class="t"> 动态 </text>
+							</view>
+							<view class="list">
+								<template v-for="(monthData, monthIndex) in monthList" :key="monthIndex">
+									<!-- 月份头部 -->
+									<view
+										class="list-head"
+										:class="{ is_sticky: isSticky(monthIndex) }"
+										v-show="isAtTop"
+										:id="'list-head-' + monthIndex"
+									>
+										<view class="current-m">
+											<span class="t-current-m">{{ monthData.month }}</span>
+											<uni-icons
+												custom-prefix="iconfont-3156"
+												type="icon-sanjiaoxing_xiangxia"
+												size="12"
+												color="#9e9fa7"
+												class="sticky-icon"
+												v-show="maxIndex == monthIndex"
+											></uni-icons>
+										</view>
+										<uni-icons
+											custom-prefix="iconfont-3156"
+											type="icon-shaixuan-F"
+											size="16"
+											color="#9e9fa7"
+											class="sticky-icon"
+											v-show="maxIndex == monthIndex"
+										></uni-icons>
+									</view>
+
+									<!-- 月份内容 -->
+									<template v-for="(item, index) in monthData.list" :key="index">
+										<!-- 消息卡片 -->
+										<view class="card" v-if="item.type === 'message'">
+											<view class="title">
+												<u-icon name="bell-fill" color="#f2c342" size="36"></u-icon>
+												<text class="t-h">{{ item.title }}</text>
+											</view>
+											<view class="con">
+												<view class="left">
+													<image :src="item.img" mode="aspectFit" class="new-img" />
+												</view>
+												<view class="notice">
+													<view class="title">
+														<image :src="item.icon" mode="aspectFit" class="new-icon" />
+														<text class="title-text">{{ item.content }}</text>
+													</view>
+													<view class="desc">
+														<text class="t-desc">{{ item.desc }}</text>
+													</view>
+												</view>
+											</view>
+										</view>
+
+										<!-- 普通卡片 -->
+										<view class="card" v-else-if="item.type === 'normal'">
+											<view class="con">
+												<view class="left">
+													<image
+														:src="item.img"
+														mode="aspectFit"
+														class="new-img icon"
+														v-if="!item.isTransfer"
+													/>
+													<view class="circle-btn" v-if="item.isTransfer">{{
+														getTransferInitial(item.transferName || "")
+													}}</view>
+												</view>
+												<view class="right">
+													<view class="l">
+														<view
+															class="title"
+															:class="{ jiangli: item.reward, transfer: item.isTransfer }"
+														>
+															<text class="l-text" v-if="!item.isTransfer">{{ item.title }}</text>
+															<text class="l-text" v-else
+																>{{ item.transferType }} {{ item.transferName }}</text
+															>
+														</view>
+														<view class="desc">
+															<text class="time">{{ item.time }}</text>
+														</view>
+													</view>
+													<view class="r">
+														<view class="jiang-box" v-if="item.reward">
+															<text class="r-text">{{ item.reward }}</text>
+															<image :src="item.rewardImg" mode="aspectFit" class="new-img" />
+														</view>
+														<view class="m-t" v-if="item.money">
+															<view class="m-desc">
+																<text class="m-type">{{ item.moneyType }}</text>
+																<text class="money">{{ item.money }}</text>
+															</view>
+															<text class="m-tip">{{ item.tip }}</text>
+														</view>
+														<view class="tip" v-if="item.tipText">{{ item.tipText }}</view>
+														<view class="desc" v-if="item.autoBtn">
+															<view class="auto-btn">{{ item.autoBtn }}</view>
+														</view>
+													</view>
+												</view>
+											</view>
+										</view>
+										<view class="card" v-else-if="item.type === 'money'">
+											<view class="con">
+												<view class="left">
+													<image
+														:src="item.img"
+														mode="aspectFit"
+														class="new-img icon"
+														v-if="!item.isTransfer"
+													/>
+													<view class="circle-btn" v-if="item.isTransfer">{{
+														getTransferInitial(item.transferName || "")
+													}}</view>
+												</view>
+												<view class="right">
+													<view class="l">
+														<view
+															class="title"
+															:class="{ jiangli: item.reward, transfer: item.isTransfer }"
+														>
+															<text class="l-text" v-if="!item.isTransfer">{{ item.title }}</text>
+															<text class="l-text" v-else
+																>{{ item.transferType }} {{ item.transferName }}</text
+															>
+														</view>
+														<view class="desc">
+															<text class="time">{{ item.time }}</text>
+														</view>
+													</view>
+													<view class="r">
+														<view class="jiang-box" v-if="item.reward">
+															<text class="r-text">{{ item.reward }}</text>
+															<image :src="item.rewardImg" mode="aspectFit" class="new-img" />
+														</view>
+														<view class="m-t" v-if="item.money">
+															<view class="m-desc">
+																<text class="m-type">{{ item.moneyType }}</text>
+																<text class="money">{{ item.money }}</text>
+															</view>
+															<text class="m-tip">{{ item.tip }}</text>
+														</view>
+														<view class="tip" v-if="item.tipText">{{ item.tipText }}</view>
+														<view class="desc" v-if="item.autoBtn">
+															<view class="auto-btn">{{ item.autoBtn }}</view>
+														</view>
+													</view>
+												</view>
+											</view>
+										</view>
+
+										<!-- 广告卡片 -->
+										<view class="ad" v-else-if="item.type === 'ad'">
+											<image :src="item.img" mode="fill" class="ad-img" :style="item.style" />
+										</view>
+									</template>
+								</template>
+							</view>
+						</view>
+					</scroll-view>
 				</view>
 				<view
-					class="main-btn"
-					:style="mainButtonStyle"
-					@touchstart.stop.prevent="onTouchStart"
-					@touchmove.stop.prevent="onTouchMove"
-					@touchend.stop.prevent="onTouchEnd"
+					class="tran-container"
+					:class="[{ active: state.isDragging, completed: state.completed }]"
+					:style="tranStyle"
 				>
-					<div v-show="!state.completed" class="icon">
-						<view class="tran-text-wrapper tran-out" :style="tranTextWrapperStyle">
-							<text class="tran-text" :style="tranTextStyle">转出</text>
-							<uni-icons
-								custom-prefix="iconfont-3156"
-								type="icon-xiangshangjiantoukuan-xianxing"
-								size="15"
-								color="#c5c5cd"
-								class="arrow-up"
-								:style="tranTextStyle"
-							></uni-icons>
-						</view>
-						<view class="tran-guid">
-							<image :src="tranGuidSvgIcon" mode="fill"></image>
-						</view>
-						<view class="tran-text-wrapper tran-in" :style="tranTextWrapperStyle">
-							<uni-icons
-								custom-prefix="iconfont-3156"
-								type="icon-xiangxiajiantoukuan-xianxing"
-								size="15"
-								color="#c5c5cd"
-								class="arrow-down"
-								:style="tranTextStyle"
-							></uni-icons>
-							<text class="tran-text" :style="tranTextStyle">转入</text>
-						</view>
-					</div>
+					<view
+						v-show="state.isDragging"
+						class="main-btn origin-point"
+						:style="originPointStyle"
+					></view>
+					<view v-show="state.isDragging" class="connection-line" :style="connectionStyle">
+						<image :src="connectSvgIcon" mode="fill"></image>
+					</view>
+					<view
+						class="main-btn"
+						:style="mainButtonStyle"
+						@touchstart.stop.prevent="onTouchStart"
+						@touchmove.stop.prevent="onTouchMove"
+						@touchend.stop.prevent="onTouchEnd"
+					>
+						<div v-show="!state.completed" class="icon">
+							<view class="tran-text-wrapper tran-out" :style="tranTextWrapperStyle">
+								<text class="tran-text" :style="tranTextStyle">转出</text>
+								<uni-icons
+									custom-prefix="iconfont-3156"
+									type="icon-xiangshangjiantoukuan-xianxing"
+									size="15"
+									color="#c5c5cd"
+									class="arrow-up"
+									:style="tranTextStyle"
+								></uni-icons>
+							</view>
+							<view class="tran-guid">
+								<image :src="tranGuidSvgIcon" mode="fill"></image>
+							</view>
+							<view class="tran-text-wrapper tran-in" :style="tranTextWrapperStyle">
+								<uni-icons
+									custom-prefix="iconfont-3156"
+									type="icon-xiangxiajiantoukuan-xianxing"
+									size="15"
+									color="#c5c5cd"
+									class="arrow-down"
+									:style="tranTextStyle"
+								></uni-icons>
+								<text class="tran-text" :style="tranTextStyle">转入</text>
+							</view>
+						</div>
+					</view>
 				</view>
 			</view>
+
+			<!-- 未登录 -->
+			<view class="guid" v-if="!hanLogin">
+				<view class="section-one">
+					<!-- logo -->
+					<view class="head">
+						<view class="nav-item-l">
+							<image :src="logoSrc" mode="aspectFit" class="logo-img" />
+						</view>
+
+						<view class="nav-item-r">
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-kefu"
+								size="30"
+								class="kf"
+							></uni-icons>
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-erweima"
+								size="26"
+								class="qrcode"
+							></uni-icons>
+						</view>
+					</view>
+				</view>
+
+				<view class="login-box">
+					<view class="login-btn" @tap="toLogin">
+						<text class="btn-t">登入</text>
+					</view>
+					<view class="main-btn" :style="mainButtonStyle">
+						<div v-show="!state.completed" class="icon">
+							<view class="tran-text-wrapper tran-out" :style="tranTextWrapperStyle">
+								<image src="/static//3156/img/shuangjiantou.png" mode="fill" class="up"></image>
+							</view>
+							<view class="tran-guid">
+								<image :src="tranGuidSvgIcon" mode="fill"></image>
+							</view>
+							<view class="tran-text-wrapper tran-in" :style="tranTextWrapperStyle">
+								<image src="/static//3156/img/shuangjiantou.png" mode="fill" class="down"></image>
+							</view>
+						</div>
+					</view>
+				</view>
+			</view>
+
+			<!-- 编辑按钮 -->
+			<u-button
+				@click="showEditPopup = true"
+				type="primary"
+				size="medium"
+				:style="editStyle"
+				v-if="userInfo.info?.isIcon && hanLogin"
+				>编辑数据</u-button
+			>
 		</view>
 
-		<!-- <tabbar /> -->
+		<!-- 编辑弹窗表单 -->
+		<u-popup v-model="showEditPopup" mode="center">
+			<view class="edit-dialog" :style="editDialogStyle">
+				<view class="edit-tabs">
+					<u-tabs :list="tabsList" v-model="tabsIndex" />
+				</view>
+
+				<template v-if="tabsIndex == 0">
+					<view class="edit-header">
+						<view class="edit-title">编辑月份</view>
+					</view>
+					<view class="edit-content">
+						<view class="yue-list" style="padding: 50rpx 0">
+							<view class="yue-item" v-for="(item, idx) in monthListEditable" :key="idx">
+								<view class="yue-item-title">
+									<u-input v-model="item.month" placeholder="月份" :border="true" />
+								</view>
+							</view>
+						</view>
+					</view>
+				</template>
+				<template v-if="tabsIndex == 1">
+					<view class="edit-header">
+						<view class="edit-title">编辑月份数据</view>
+
+						<view class="yue-title-tabs">
+							<!-- <u-button @click="addMonth" size="mini" type="success">+月</u-button> -->
+							<u-tabs
+								:list="monthListEditable.map((m) => ({ name: m.month }))"
+								v-model="currentEditMonthIndex"
+							/>
+							<!-- <u-button
+						@click="removeMonth"
+						size="mini"
+						type="error"
+						v-if="monthListEditable.length > 1"
+						>删月</u-button
+					> -->
+						</view>
+					</view>
+					<u-button @click="addItem" size="mini" type="success">添加一条</u-button>
+					<scroll-view scroll-y class="scroll-Y" ref="editScrollView" :scroll-top="scrollTop">
+						<view class="edit-content">
+							<view
+								v-for="(item, idx) in monthListEditable[currentEditMonthIndex].list"
+								:key="idx"
+								class="edit-item"
+							>
+								<view class="item">
+									<u-input
+										v-model="item.type"
+										placeholder="类型(消息/普通/广告/交易)"
+										disabled
+										:border="true"
+									/>
+								</view>
+								<view class="item" v-if="item.type != 'ad' && item.type != 'message'">
+									<u-input v-model="item.title" placeholder="标题" :border="true" />
+								</view>
+
+								<view class="item" v-if="item.type == 'message'">
+									<u-input v-model="item.content" placeholder="副标题" :border="true" />
+								</view>
+								<view class="item" v-if="item.type === 'message'">
+									<u-input v-model="item.desc" placeholder="描述" :border="true" />
+								</view>
+								<view class="item" v-if="item.type != 'ad'">
+									<u-input v-model="item.time" placeholder="时间" :border="true" />
+								</view>
+
+								<view class="item" v-if="item.type === 'money'">
+									<u-input v-model="item.money" placeholder="金额" :border="true" />
+								</view>
+								<view class="item" v-if="item.type === 'money'">
+									<u-input v-model="item.moneyType" placeholder="金额类型" :border="true"
+								/></view>
+								<view class="item" v-if="item.type === 'money'"
+									><u-input
+										v-model="item.tip"
+										placeholder="提示词"
+										v-if="item.type === 'money'"
+										:border="true"
+								/></view>
+								<view class="item" v-if="item.type === 'normal'"
+									><u-input
+										v-model="item.tipText"
+										placeholder="右侧提示词"
+										v-if="item.type === 'normal'"
+										:border="true"
+								/></view>
+								<view class="item" v-if="item.type === 'normal'">
+									<u-input
+										v-model="item.autoBtn"
+										placeholder="右侧提示词2"
+										v-if="item.type === 'normal'"
+										:border="true"
+									/>
+								</view>
+								<view class="item">
+									<u-input v-model="item.sort" placeholder="排序" :border="true" />
+								</view>
+
+								<u-button @click="removeItem(idx)" size="mini" type="error">删除</u-button>
+							</view>
+						</view>
+					</scroll-view>
+				</template>
+				<template v-if="tabsIndex == 2">
+					<view class="edit-header">
+						<view class="edit-title">编辑个人资料</view>
+					</view>
+					<scroll-view scroll-y class="scroll-Y">
+						<view class="edit-content">
+							<view class="edit-item">
+								<view class="item">
+									<u-input v-model="userData.username" placeholder="请输入姓名" :border="true"
+								/></view>
+								<view class="item">
+									<u-input v-model="userData.avatar" placeholder="请输入号码" :border="true"
+								/></view>
+								<view class="item">
+									<u-input v-model="userData.desc" placeholder="请输入余额描述" :border="true"
+								/></view>
+								<view class="item">
+									<u-input v-model="userData.money" placeholder="请输入余额" :border="true"
+								/></view>
+								<view class="item">
+									<u-input v-model="userData.errorMsg" placeholder="请输入错误信息" :border="true"
+								/></view>
+							</view>
+						</view>
+					</scroll-view>
+				</template>
+				<view class="edit-footer">
+					<button class="edit-btn cancel" @click="showEditPopup = false">取消</button>
+					<button class="edit-btn confirm" @click="saveEditMonthList">保存</button>
+				</view>
+			</view>
+		</u-popup>
+
+		<tabbar :isAtTop="isAtTop" />
 	</cl-page>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, reactive, computed, onMounted, getCurrentInstance, nextTick } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import Tabbar from "/@/components/tabbar.vue";
-import { dzhStore } from "/@/dzh";
+import { dzhStore, MonthList, UserInfo } from "/@/dzh";
+import { router } from "/@/cool";
 
-const logoSrc = ref("/static/3156/logo.png");
-const { setting } = dzhStore();
-uni.hideTabBar();
-const viewportHeight = ref(uni.getSystemInfoSync().windowHeight);
-const viewportWidth = ref(uni.getSystemInfoSync().windowWidth);
-
+const { userInfo, tranFlowInfo } = dzhStore();
 const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
 const isAnimating = ref(false);
 const UP_THRESHOLD = 10; // 上滑阈值
 const DOWN_THRESHOLD = 5; // 下滑阈值
 const isAtTop = ref(false); // 是否在顶部位置
-
-let appTop = 0; // section-two的初始top值（rpx）
+const hanLogin = ref(true);
+const logoSrc = ref(hanLogin.value ? "/static/3156/img/avtar.png" : "/static/3156/img/avtar.png");
+let appTop = 90; // section-two的初始top值（rpx）
 // #ifdef APP
 // 根据平台调整高度比例
-appTop = 90;
+appTop = 160;
 // #endif
-
+const viewportWidth = ref(uni.getSystemInfoSync().windowWidth);
 // 计算section-two的初始位置到顶部的距离
 const INITIAL_TOP_DISTANCE = 760 - appTop; // section-two的初始top值（rpx）
 const INITIAL_TOP_DISTANCE_PX = (INITIAL_TOP_DISTANCE * viewportWidth.value) / 750; // 转换为px
@@ -444,6 +609,16 @@ const sectionTwoStyle = computed(() => ({
 	transition: isAnimating.value ? "transform 0.3s ease" : "none",
 	willChange: "transform",
 }));
+//
+let appBottom = 150;
+// #ifdef APP
+appBottom = 250;
+// #endif
+
+const newContainStyle = computed(() => ({
+	zIndex: showTopTile.value ? "8" : "11",
+	paddingBottom: `${appBottom}rpx`,
+}));
 
 const state = reactive({
 	originX: 0,
@@ -464,12 +639,21 @@ const px2rpx = (value: number) => {
 	return (value * 750) / state.screenWidth;
 };
 // 水滴效果按钮圆
-const mainButtonStyle = computed(() => ({
-	transform: `translate(${px2rpx(state.currentX) - 60}rpx, ${
-		px2rpx(state.currentY) - 60
-	}rpx) scale(var(--float-scale))`,
-	transition: state.isDragging ? "none" : "",
-}));
+const mainButtonStyle = computed(() => {
+	if (hanLogin.value) {
+		return {
+			transform: `translate(${px2rpx(state.currentX) - 60}rpx, ${
+				px2rpx(state.currentY) - 60
+			}rpx) scale(var(--float-scale))`,
+			transition: state.isDragging ? "none" : "",
+		};
+	}
+	if (!hanLogin.value) {
+		return {
+			position: "static" as const,
+		};
+	}
+});
 
 // 水滴效果小圆点
 const originPointStyle = computed(() => ({
@@ -529,7 +713,7 @@ const tranTextWrapperStyle = computed(() => {
 		opacity: 1 - Math.min(distance.value / 10, 1),
 	};
 });
-
+// 按钮位置初始化
 const initPosition = () => {
 	const { screenWidth, windowHeight } = uni.getSystemInfoSync();
 	state.screenWidth = screenWidth;
@@ -541,17 +725,17 @@ const initPosition = () => {
 	// #endif
 	// #ifndef APP
 	// 根据平台调整高度比例
-	heightRatio = 0.55;
+	heightRatio = 0.59;
 	// #endif
 	state.originY = windowHeight * heightRatio;
 	state.currentX = state.originX;
 	state.currentY = state.originY;
 };
-
+// 按钮触摸
 const onTouchStart = () => {
 	state.isDragging = true;
 };
-
+// 按钮触摸
 const onTouchMove = (e: TouchEvent) => {
 	if (!state.isDragging) return;
 	const touch = e.touches[0];
@@ -571,7 +755,7 @@ const onTouchMove = (e: TouchEvent) => {
 	state.currentX = newX;
 	state.currentY = newY;
 };
-
+// 按钮触摸
 const onTouchEnd = () => {
 	state.isDragging = false;
 	const offset = rpx2px(distance.value);
@@ -579,10 +763,10 @@ const onTouchEnd = () => {
 	if (offset > state.maxDistance - 10) {
 		state.completed = true;
 		setTimeout(() => {
-			uni.switchTab({
-				url: "/pages/index/my",
-				animationType: "slide-in-right",
-				animationDuration: 200,
+			uni.navigateTo({
+				url: "/pages/index/transfer",
+				// animationType: "slide-in-right",
+				// animationDuration: 200,
 				success: (res) => {},
 				fail: () => {},
 				complete: () => {
@@ -606,8 +790,7 @@ const topTitle = computed(() => {
 });
 const scrollTop = ref(0);
 const showTopTile = ref(false);
-const topName = ref("");
-const topNameArray = reactive(["本月", "5月", "4月"]);
+
 // 添加滚动事件处理函数
 const upper = (e: any) => {
 	console.log("滚动到顶部");
@@ -616,59 +799,61 @@ const upper = (e: any) => {
 const lower = (e: any) => {
 	console.log("滚动到底部");
 };
+const maxIndex = ref(0);
+const stickyStates = ref<boolean[]>([]);
 
+// 判断某个 list-head 是否在顶部
+const isSticky = (index: number) => {
+	return stickyStates.value[index];
+};
+
+// 修改 scroll 函数
 const scroll = (e: any) => {
 	const currentScrollTop = e.detail.scrollTop;
 	scrollTop.value = currentScrollTop;
 
-	// 实时获取所有 list-head 元素的位置
-	uni
-		.createSelectorQuery()
-		.selectAll(".list-head")
-		.boundingClientRect((data: any) => {
-			if (data) {
-				let arr: number[] = [];
-				// 检查是否所有元素都在阈值之上
-				const allAboveThreshold = data.every((item: any) => item.top > rpx2px(70));
-				if (allAboveThreshold) {
-					showTopTile.value = false;
-				} else {
-					// 找到到达顶部的最大索引
-					let maxIndex = -1;
-					data.forEach((item: any, index: number) => {
-						if (item.top <= rpx2px(70 + appTop)) {
-							maxIndex = Math.max(maxIndex, index);
-							showTopTile.value = true;
-							arr.push(index);
-						}
-					});
-
-					// 如果找到了到达顶部的元素，获取其文本内容
-					if (maxIndex !== -1) {
-						topName.value = topNameArray[maxIndex];
-						console.log("topName", topName.value);
-					}
+	nextTick(() => {
+		// 使用 uni.createSelectorQuery 获取元素位置
+		const query = uni.createSelectorQuery();
+		monthList.value.forEach((_, index) => {
+			query.select(`#list-head-${index}`).boundingClientRect((rect: any) => {
+				if (rect) {
+					// 70rpx 转换为 px
+					const stickyThreshold = rpx2px(70);
+					stickyStates.value[index] = rect.top <= stickyThreshold;
 				}
-			}
-		})
-		.exec();
+			});
+		});
+	});
+
+	if (scrollTop.value > rpx2px(70)) {
+		showTopTile.value = true;
+	} else {
+		showTopTile.value = false;
+	}
 };
 
-onMounted(() => {
-	initPosition();
- 
-});
+const logout = () => {
+	userInfo.set({
+		username: userInfo.info?.username,
+		password: "",
+		desc: userInfo.info?.desc || "可用活期余额：HKD 23,628.18，今日可转账限额：HKD267,010.00",
+		money: userInfo.info?.money || 1547434,
+		isIcon: userInfo.info?.isIcon || false,
+		errorMsg: userInfo.info?.errorMsg || "付款账户状态异常，该交易未能处理。请于工作时间内联系我们",
+	});
+	hanLogin.value = false;
+};
 
-onBeforeUnmount(() => {});
-
+// 屏幕触摸
 const handleTouchStart = (e: TouchEvent) => {
-	if (isAnimating.value) return;
+	if (isAnimating.value || showEditPopup.value) return;
 	touchStartY.value = e.touches[0].clientY;
 	isAnimating.value = false;
 };
-
+// 屏幕触摸
 const handleTouchMove = (e: TouchEvent) => {
-	if (isAnimating.value) return;
+	if (isAnimating.value || showEditPopup.value) return;
 
 	const deltaY = e.touches[0].clientY - touchStartY.value;
 	const nextOffset = currentOffset.value + deltaY;
@@ -706,9 +891,9 @@ const handleTouchMove = (e: TouchEvent) => {
 
 	touchStartY.value = e.touches[0].clientY;
 };
-
+// 屏幕触摸
 const handleTouchEnd = () => {
-	if (isAnimating.value) return;
+	if (isAnimating.value || showEditPopup.value) return;
 
 	isAnimating.value = true;
 	const deltaY = currentOffset.value - INITIAL_POSITION;
@@ -733,13 +918,14 @@ const handleTouchEnd = () => {
 };
 
 const tranOpacity = computed(() => {
-	const progress = Math.abs(currentOffset.value) / 20; // 使用30px作为渐变范围
+	const progress = Math.abs(currentOffset.value) / 20; // 渐变范围
 	return Math.max(0, 1 - progress);
 });
 
 const tranStyle = computed(() => ({
 	opacity: tranOpacity.value,
 	transition: isAnimating.value ? "opacity 0.3s ease" : "none",
+	display: tranOpacity.value == 0 ? "none" : "block",
 }));
 
 // tran 按钮移动相关状态
@@ -755,6 +941,12 @@ const tranTextStyle = computed(() => ({
 	transition: "opacity 0.3s ease",
 }));
 
+// 添加存款金额变量
+const depositAmount = computed(() => {
+	return userInfo.info?.money ?? 0;
+});
+
+// 第二屏导航
 const navItems = ref([
 	{ img: "/static/3156/img/card-icon.png", name: "ZA Card" },
 	{ img: "/static/3156/img/zhuan-icon.png", name: "转账" },
@@ -762,6 +954,398 @@ const navItems = ref([
 	{ img: "/static/3156/img/baoxian-icon.png", name: "保险" },
 	{ img: "/static/3156/img/jijin-icon.png", name: "基金" },
 ]);
+
+// 第一屏导航
+const navList = [
+	{
+		img: "/static/3156/img/n1.png",
+		text: "存款",
+	},
+	{
+		img: "/static/3156/img/n2.png",
+		text: "保险",
+	},
+	{
+		img: "/static/3156/img/n3.png",
+		text: "账户信息",
+	},
+	{
+		img: "/static/3156/img/n4.png",
+		text: "钱罐",
+	},
+	{
+		img: "/static/3156/img/n5.png",
+		text: "海外汇款",
+	},
+	{
+		img: "/static/3156/img/n6.png",
+		text: "推荐好友",
+	},
+	{
+		img: "/static/3156/img/n7.png",
+		text: "最劲抽",
+	},
+	{
+		img: "/static/3156/img/n8.png",
+		text: "全部",
+	},
+];
+
+// 全局控制变量
+const useRandomTime = ref(false);
+
+// 月份数组改为计算属性
+const monthArray = ref(["本月", "5月", "4月"]);
+
+// 静态默认数据改为计算属性
+const defaultMonthList = ref<MonthList>([
+	{
+		month: monthArray.value[0],
+		list: [
+			// {
+			// 	type: "message",
+			// 	img: "/static/3156/img/new-1.png",
+			// 	title: "消息(+14)",
+			// 	icon: "/static/3156/img/new-icon.png",
+			// 	content: "「最佳销售」基金排行榜更新了",
+			// 	desc: "查看过往3个月最受欢迎的基金。投资...",
+			// 	sort: 1,
+			// 	time: "6月15日 14:30",
+			// },
+			{
+				type: "normal",
+				img: "/static/3156/img/icon1.png",
+				title: "有 2 个新用户专属任务在等你！即刻做任务赚丰富奖...",
+				time: "6月15日 13:20",
+				reward: "赚奖赏",
+				rewardImg: "/static/3156/img/t_27.png",
+				sort: 2,
+			},
+			{
+				type: "money",
+				img: "/static/3156/img/t_28.png",
+				title: "港元- 派息",
+				time: "6月1日 01:28",
+				moneyType: "+HKD",
+				money: "0.40",
+				isInterest: true,
+				sort: 3,
+			},
+			// {
+			// 	type: "ad",
+			// 	img: "/static/3156/img/ad1.png",
+			// 	style: "width: 100%; height: 210rpx",
+			// 	sort: 4,
+			// },
+		],
+	},
+	{
+		month: monthArray.value[1],
+		list: [
+			{
+				type: "message",
+				img: "/static/3156/img/t_31.jpg",
+				title: "消息(+14)",
+				icon: "/static/3156/img/t_32.jpg",
+				content: "31/5 截止！领高达 HKD 880！",
+				desc: "不要错过领高达 HKD 880 的最后机会...",
+				sort: 1,
+				time: "6月15日 14:30",
+			},
+			{
+				type: "ad",
+				img: "/static/3156/img/ad3.png",
+				style: "width: 100%; height: 210rpx",
+				sort: 2,
+			},
+			{
+				type: "money",
+				img: "/static/3156/img/t_28.png",
+				title: "港元- 派息",
+				time: "5月1日 01:28",
+				moneyType: "+HKD",
+				money: "0.39",
+				isInterest: true,
+				sort: 3,
+			},
+			// {
+			// 	type: "normal",
+			// 	img: "/static/3156/img/icon2.png",
+			// 	title: "成功用新设备登录",
+			// 	time: "5月9日 00:35",
+			// 	sort: 1,
+			// },
+			// {
+			// 	type: "normal",
+			// 	img: "/static/3156/img/icon2.png",
+			// 	title: "签到成功",
+			// 	time: "5月7日 11:34",
+			// 	tipText: "爆肌 Alfle",
+			// 	sort: 2,
+			// },
+			// {
+			// 	type: "ad",
+			// 	img: "/static/3156/img/ad2.jpg",
+			// 	style: "width: 460rpx; height: 150rpx",
+			// 	sort: 3,
+			// },
+		],
+	},
+	{
+		month: monthArray.value[2],
+		list: [
+			{
+				type: "normal",
+				img: "/static/3156/img/icon2.png",
+				title: "签到成功",
+				time: "4月2日 00:55",
+				tipText: "爆肌 Alfle",
+				sort: 2,
+			},
+			{
+				type: "normal",
+				img: "/static/3156/img/icon2.png",
+				title: "成功用新设备登录",
+				time: "4月2日 00:30",
+				sort: 1,
+			},
+
+			{
+				type: "money",
+				img: "/static/3156/img/t_28.png",
+				title: "港元- 派息",
+				time: "4月1日 01:28",
+				moneyType: "+HKD",
+				money: "0.18",
+				isInterest: true,
+				sort: 3,
+			},
+			// {
+			// 	type: "money",
+			// 	img: "/static/3156/img/icon2.png",
+			// 	transferType: "转给",
+			// 	transferName: "HEN Z******",
+			// 	time: "4月30日 11:34",
+			// 	moneyType: "-HKD",
+			// 	money: "50.00",
+			// 	tip: "成功入账",
+			// 	isTransfer: true,
+			// 	sort: 1,
+			// },
+			// {
+			// 	type: "normal",
+			// 	img: "/static/3156/img/diyuee-icon.png",
+			// 	title: "低余额提示",
+			// 	time: "4月1日 00:34",
+			// 	autoBtn: "自动增值",
+			// 	sort: 3,
+			// },
+		],
+	},
+]);
+
+// 修改 monthListEditable 的初始化
+// const monthListEditable = ref(JSON.parse(JSON.stringify(defaultMonthList.value)));
+const monthListEditable = computed(() => defaultMonthList.value);
+
+// 修改 monthList 计算属性
+const monthList = computed(() => {
+	if (!useRandomTime.value) {
+		return defaultMonthList.value.map((month) => ({
+			...month,
+			list: [...month.list].sort((a, b) => (a.sort || 0) - (b.sort || 0)),
+		}));
+	}
+
+	return defaultMonthList.value.map((month) => ({
+		...month,
+		list: month.list
+			.map((item) => ({
+				...item,
+				time: item.time
+					? generateRandomTime(parseInt(month.month === "本月" ? "6" : month.month))
+					: undefined,
+			}))
+			.sort((a, b) => (a.sort || 0) - (b.sort || 0)),
+	}));
+});
+
+// 添加生成随机时间的函数
+const generateRandomTime = (month: number): string => {
+	const now = new Date();
+	const currentMonth = now.getMonth() + 1;
+	const currentDay = now.getDate();
+	const currentHour = now.getHours();
+	const currentMinute = now.getMinutes();
+
+	// 获取月份的天数
+	const daysInMonth = new Date(2024, month, 0).getDate();
+
+	// 如果是当前月份，限制日期不超过今天
+	let maxDay = daysInMonth;
+	if (month === currentMonth) {
+		maxDay = currentDay;
+	}
+
+	// 生成随机日期
+	const day = Math.floor(Math.random() * maxDay) + 1;
+
+	// 如果是当前月份且是今天，限制时间不超过当前时间
+	let maxHour = 24;
+	let maxMinute = 60;
+	if (month === currentMonth && day === currentDay) {
+		maxHour = currentHour;
+		maxMinute = currentMinute;
+	}
+
+	// 生成随机时间
+	const hour = Math.floor(Math.random() * maxHour);
+	const minute = Math.floor(Math.random() * maxMinute);
+
+	return `${month}月${day}日 ${hour.toString().padStart(2, "0")}:${minute
+		.toString()
+		.padStart(2, "0")}`;
+};
+
+// 添加获取首字母的计算属性
+const getTransferInitial = (name: string): string => {
+	if (!name) return "";
+	return name.charAt(0).toUpperCase();
+};
+
+// 添加数字格式化函数
+const formatNumber = (num: number): string => {
+	return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+//////////////////// 编辑弹窗相关方法 ////////////////////
+
+const tabsList = ref([{ name: "月份" }, { name: "数据" }, { name: "我的" }]);
+const tabsIndex = ref(0);
+const showEditPopup = ref(false);
+
+//个人资料
+const currentEditMonthIndex = ref(0);
+const userData = ref<UserInfo>({
+	username: "llt888999",
+	password: "",
+	avatar: "",
+	desc: "可用活期余额：HKD 47,434.97,今日可转账限额：HKD200,000.00",
+	money: 47434.97,
+	isIcon: false,
+	errorMsg: "付款账户状态异常，该交易未能处理。请于工作时间内联系我们",
+});
+
+// 个人资料
+
+let appTop_ = 0;
+// #ifdef APP
+appTop_ = 120;
+// #endif
+// #ifndef APP
+appTop_ = 90;
+// #endif
+const editDialogStyle = computed(() => ({
+	padding: `${appTop - appTop_}px 0 0 0`,
+}));
+
+const addItem = () => {
+	monthListEditable.value[currentEditMonthIndex.value].list.push({
+		type: "normal",
+		title: "",
+		time: "",
+		money: "",
+		moneyType: "",
+		tip: "",
+		sort: monthListEditable.value[currentEditMonthIndex.value].list.length + 1,
+	});
+
+	// 使用 nextTick 确保 DOM 更新后再滚动
+	nextTick(() => {
+		const query = uni.createSelectorQuery();
+		query
+			.select(".edit-content")
+			.boundingClientRect((rect) => {
+				if (rect && rect.height) {
+					scrollTop.value = rect.height;
+				}
+			})
+			.exec();
+	});
+};
+const removeItem = (idx: number) => {
+	monthListEditable.value[currentEditMonthIndex.value].list.splice(idx, 1);
+};
+const addMonth = () => {
+	monthListEditable.value.push({
+		month: `新月份${monthListEditable.value.length + 1}`,
+		list: [],
+	});
+	currentEditMonthIndex.value = monthListEditable.value.length - 1;
+};
+const removeMonth = () => {
+	if (monthListEditable.value.length > 1) {
+		monthListEditable.value.splice(currentEditMonthIndex.value, 1);
+		currentEditMonthIndex.value = 0;
+	}
+};
+const editStyle = computed(() => ({
+	position: "fixed",
+	right: "50rpx",
+	top: appTop - appTop_ + 30 + "px",
+	zIndex: "999",
+}));
+
+const saveEditMonthList = () => {
+	useRandomTime.value = false;
+	showEditPopup.value = false;
+
+	if (userData.value?.username == "" || userData.value?.desc == "") {
+		uni.showToast({
+			title: "请输入数据",
+			icon: "none",
+		});
+		return;
+	}
+	userInfo.set(userData.value);
+	tranFlowInfo.set(defaultMonthList.value);
+};
+
+const toLogin = () => {
+	uni.navigateTo({
+		url: "/pages/user/login",
+		success: function (res) {
+			hanLogin.value = true;
+		},
+	});
+	hanLogin.value = true;
+};
+
+onMounted(() => {
+	initPosition();
+	stickyStates.value = new Array(monthList.value.length).fill(false);
+	console.log(userInfo.info);
+	userInfo.set(userData.value);
+	tranFlowInfo.set(defaultMonthList.value);
+});
+
+onShow(() => {
+	console.log("onShow", userInfo.info?.password);
+
+	if (userInfo.info?.password != "") {
+		console.log("onShow 不空");
+		hanLogin.value = true;
+		userData.value = JSON.parse(JSON.stringify(userInfo.info));
+		if (tranFlowInfo.info) {
+			defaultMonthList.value = JSON.parse(JSON.stringify(tranFlowInfo.info));
+		}
+	}
+	if (userInfo.info?.password == "") {
+		console.log("onShow 空");
+		hanLogin.value = false;
+		return;
+	}
+});
 </script>
 
 <style scoped>
@@ -794,744 +1378,908 @@ const navItems = ref([
 	box-sizing: border-box;
 }
 
-.main {
-	height: 100vh;
-	position: relative;
-	overflow: hidden;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	// transform: translateZ(0); // 创建新的层叠上下文
-}
-
-.numFont {
-	font-family: "number-3156" !important;
-	letter-spacing: 0.001rem;
-}
-.scroll-Y {
-	height: 100vh;
-	-webkit-overflow-scrolling: touch;
-	overflow-y: auto;
-	position: relative;
-	transform: translateZ(0);
-	will-change: transform;
-}
-.section-one {
-	height: 760rpx;
-	position: fixed;
-	z-index: 0;
-	transition: opacity 0.3s ease;
-	will-change: opacity;
-	width: 90%;
-	// border: 2px solid #dd9734;
-	padding-top: 0.7rem;
-	// display: none;
-	.head {
-		width: 100%;
-		height: 90rpx;
-		padding: 0 10rpx;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		overflow: hidden;
-		// border: 1px solid #ccc;
-		overflow: hidden;
-
-		.nav-item-l {
-			display: flex;
-			gap: 15rpx;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-
-			.logo-img {
-				width: 68rpx;
-				height: 68rpx;
-				overflow: hidden;
-			}
-
-			.name {
-				font-weight: bold;
-				font-size: 32rpx;
-				letter-spacing: 0.001rem;
-			}
-		}
-
-		.nav-item-r {
-			display: flex;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			gap: 34rpx;
-
-			.kf {
-				font-weight: b;
-			}
-		}
-	}
-
-	.hd {
-		margin-top: 20rpx;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 10rpx;
-
-		.card {
-			background-color: #fff;
-			padding: 20rpx 30rpx;
-			border-radius: 30rpx;
-			width: 100%;
-			height: 185rpx;
-
-			.t {
-				font-size: 23rpx;
-				line-height: 1.6rem;
-				font-weight: 400;
-			}
-
-			.go-color {
-				color: #dd9734;
-			}
-
-			.card-t {
-				display: flex;
-				flex-direction: row;
-				justify-content: flex-start;
-				align-items: center;
-				gap: 5px;
-				.yanjing {
-					color: #df1010;
-				}
-				.jiantou-right {
-					position: relative;
-					// left: 5rpx;
-				}
-				&:nth-child(2) {
-					display: flex;
-					align-items: center;
-					gap: 10rpx;
-
-					.t {
-						font-size: 35rpx;
-						font-weight: bold;
-					}
-
-					.money {
-						font-size: 42rpx;
-					}
-
-					.money-mini {
-						font-size: 34rpx;
-						font-weight: 800;
-					}
-
-					.money-fh {
-						font-size: 18rpx;
-					}
-				}
-			}
-		}
-
-		.left {
-			width: 56%;
-		}
-
-		.right {
-			flex: 1;
-			position: relative;
-
-			.dan {
-				position: absolute;
-				bottom: 20rpx;
-				right: 0rpx;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: flex-start;
-
-				.dan-img1 {
-					width: 70rpx;
-					height: 25rpx;
-				}
-
-				.dan-img2 {
-					width: 90rpx;
-					height: 90rpx;
-					position: relative;
-					top: -5px;
-				}
-
-				@keyframes rotate-bottom {
-					0%,
-					100% {
-						transform: rotate(0deg);
-					}
-
-					/* 初始/结束状态 */
-					50% {
-						transform: rotate(8deg);
-					}
-
-					/* 向右旋转15° */
-					25%,
-					75% {
-						transform: rotate(-8deg);
-					}
-
-					/* 向左旋转15° */
-				}
-
-				.rotating-image {
-					transform-origin: center bottom;
-					/* 旋转中心：底部中点 */
-					animation: rotate-bottom 1.5s infinite ease-in-out;
-					/* 动画配置 */
-				}
-			}
-		}
-	}
-
-	.nav {
-		width: 100%;
-		height: auto;
-		padding: 0rpx;
-		margin-top: 15rpx;
-
-		.nav-contain {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-around;
-			align-items: center;
-			flex-wrap: wrap;
-			height: 380rpx;
-			background-color: #fff;
-			padding: 25rpx 0;
-			border-radius: 30rpx;
-
-			.nav-item {
-				width: 150rpx;
-				height: 150rpx;
-				text-align: center;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				gap: 6rpx;
-
-				.nav-img {
-					width: 85rpx;
-					height: 85rpx;
-				}
-
-				span {
-					font-size: 24rpx;
-				}
-			}
-		}
-
-		.point {
-			width: 100%;
-			height: 18px;
-			// background-color: #dd9734;
-			display: flex;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			gap: 5rpx;
-
-			.p-black {
-				width: 16rpx;
-				height: 7rpx;
-				background-color: #4f4e4e;
-				border-radius: 80rpx;
-			}
-
-			.p-cc {
-				background-color: #ccc;
-				width: 10rpx;
-				height: 7rpx;
-				border-radius: 50%;
-			}
-		}
-	}
-}
-.section-two {
-	width: 100%;
-	height: 100vh;
-	position: absolute; // 改为fixed定位
-	top: 760rpx;
-	left: 0;
-	z-index: 1;
-	overflow: hidden;
-	.background-layer {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 10;
-		pointer-events: none;
-
-		&::before {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-size: 100% auto;
-			background-repeat: no-repeat;
-			background-position: center top;
-			transition: opacity 0.3s ease;
-			background-image: var(--slice-image);
-			opacity: var(--slice-opacity);
-		}
-
-		&::after {
-			content: "";
-			position: absolute;
-			top: var(--after-top, 0);
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-size: 100% auto;
-			background-repeat: no-repeat;
-			background-position: center top;
-			transition: opacity 0.3s ease, top 0.3s ease, background-image 0.3s ease;
-			background-image: var(--none-slice-image);
-			opacity: var(--none-slice-opacity);
-		}
-	}
-	.top-nav {
-		width: 98%;
-		position: absolute;
-		top: 90rpx;
-		z-index: 11;
-		overflow: hidden;
-		height: 90rpx;
-		.nav-list {
-			width: 108%;
-			display: flex;
-			flex-direction: row;
-			justify-content: flex-start;
-			position: relative;
-			.nav-item {
-				width: 160rpx;
-				height: 90rpx;
-				display: flex;
-				flex-direction: column;
-				justify-content: space-between;
-				align-items: center;
-				position: relative;
-				.new-img {
-					width: 40rpx;
-					height: 40rpx;
-				}
-				&:first-child {
-					justify-content: end;
-					span {
-						font-weight: 400;
-						color: #000;
-					}
-				}
-				&:last-child {
-					.new-img,
-					span {
-						position: relative;
-						&::after {
-							content: "";
-							position: absolute;
-							right: 0;
-							top: 0;
-							width: 280%;
-							height: 100%;
-							background: linear-gradient(
-								90deg,
-								rgba(0, 0, 0, 0) 30%,
-								rgb(57, 229, 177,0.9) 90%,
-								rgb(57, 229, 177,1) 100%
-							);
-							filter: blur(4px);
-							-webkit-filter: blur(4px);
-							pointer-events: none;
-						}
-					}
-				}
-			}
-		}
-	}
-	.top-title {
-		width: 100%;
+.page-main {
+	--float-scale: 1;
+	--float-background-color: #f3d76a;
+	--float-transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+	.section-one {
+		height: 760rpx;
 		position: fixed;
-		height: 120rpx;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		text-align: center;
-		background-color: #f5f5fc;
-		z-index: 12;
-		.t-all {
-			line-height: 60rpx;
-		}
-	}
-	.top-head {
-		width: 100%;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0 46rpx;
-
-		.t {
-			font-weight: bold;
-			font-size: 36rpx;
-		}
-		.current-m {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			.t-current-m {
-				font-weight: 300;
-				color: #737481;
-				font-size: 14px;
-			}
-		}
-	}
-	.new-contain {
-		width: 100%;
-		position: relative;
-		z-index: 11;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding-top: 200rpx;
-		.list {
+		z-index: 0;
+		transition: opacity 0.3s ease;
+		will-change: opacity;
+		width: 90%;
+		// border: 2px solid #dd9734;
+		padding-top: 0.7rem;
+		// display: none;
+		.head {
 			width: 100%;
+			height: 90rpx;
+			padding: 0 10rpx;
 			display: flex;
-			flex-direction: column;
+			flex-direction: row;
+			justify-content: space-between;
 			align-items: center;
-		}
-		.new-head {
-			width: 100%;
-			padding: 10rpx 46rpx;
-			.t {
-				font-weight: bold;
-				font-size: 36rpx;
-			}
-		}
-		.list-head {
-			height: 100rpx;
-		}
+			overflow: hidden;
+			// border: 1px solid #ccc;
+			overflow: hidden;
 
-		.card {
-			background-color: #fff;
-			width: 90%;
-			height: auto;
-			border-radius: 30rpx;
-			margin-bottom: 15rpx;
-			padding: 20rpx 30rpx;
-			z-index: 1;
-			.title {
+			.nav-item-l {
 				display: flex;
+				gap: 15rpx;
 				flex-direction: row;
-				justify-content: flex-start;
+				justify-content: center;
 				align-items: center;
-				gap: 5rpx;
 
-				.t-h {
-					font-weight: 300;
+				.logo-img {
+					width: 68rpx;
+					height: 68rpx;
+					overflow: hidden;
+				}
+
+				.name {
+					font-weight: bold;
+					font-size: 32rpx;
+					letter-spacing: 0.001rem;
 				}
 			}
 
-			.con {
+			.nav-item-r {
 				display: flex;
 				flex-direction: row;
-				justify-content: flex-start;
+				justify-content: center;
 				align-items: center;
-				padding: 10rpx 0;
+				gap: 34rpx;
 
-				.left {
-					padding: 0;
+				.kf {
+					font-weight: b;
+				}
+			}
+		}
 
-					.new-img {
-						width: 90rpx;
-						height: 90rpx;
-					}
+		.hd {
+			margin-top: 20rpx;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 10rpx;
 
-					.icon {
-						width: 60rpx;
-						height: 60rpx;
-					}
+			.card {
+				background-color: #fff;
+				padding: 20rpx 30rpx;
+				border-radius: 30rpx;
+				width: 100%;
+				height: 185rpx;
+
+				.t {
+					font-size: 23rpx;
+					line-height: 1.6rem;
+					font-weight: 400;
 				}
 
-				.right {
-					padding: 0 20rpx;
-					width: 100%;
+				.go-color {
+					color: #dd9734;
+				}
 
-					.title {
-						span {
+				.card-t {
+					display: flex;
+					flex-direction: row;
+					justify-content: flex-start;
+					align-items: center;
+					gap: 5px;
+					.yanjing {
+						color: #df1010;
+					}
+					.jiantou-right {
+						position: relative;
+						// left: 5rpx;
+					}
+					&:nth-child(2) {
+						display: flex;
+						align-items: center;
+						gap: 10rpx;
+
+						.t {
+							font-size: 35rpx;
 							font-weight: bold;
 						}
 
-						.new-icon {
-							width: 30rpx;
-							height: 30rpx;
+						.money {
+							font-size: 42rpx;
+						}
+
+						.money-mini {
+							font-size: 34rpx;
+							font-weight: 800;
+						}
+
+						.money-fh {
+							font-size: 18rpx;
+						}
+					}
+				}
+			}
+
+			.left {
+				width: 56%;
+			}
+
+			.right {
+				flex: 1;
+				position: relative;
+
+				.dan {
+					position: absolute;
+					bottom: 20rpx;
+					right: 0rpx;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: flex-start;
+
+					.dan-img1 {
+						width: 70rpx;
+						height: 25rpx;
+					}
+
+					.dan-img2 {
+						width: 90rpx;
+						height: 90rpx;
+						position: relative;
+						top: -5px;
+					}
+
+					@keyframes rotate-bottom {
+						0%,
+						100% {
+							transform: rotate(0deg);
+						}
+
+						/* 初始/结束状态 */
+						50% {
+							transform: rotate(8deg);
+						}
+
+						/* 向右旋转15° */
+						25%,
+						75% {
+							transform: rotate(-8deg);
+						}
+
+						/* 向左旋转15° */
+					}
+
+					.rotating-image {
+						transform-origin: center bottom;
+						/* 旋转中心：底部中点 */
+						animation: rotate-bottom 1.5s infinite ease-in-out;
+						/* 动画配置 */
+					}
+				}
+			}
+		}
+
+		.nav {
+			width: 100%;
+			height: auto;
+			padding: 0rpx;
+			margin-top: 15rpx;
+
+			.nav-contain {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-around;
+				align-items: center;
+				flex-wrap: wrap;
+				height: 380rpx;
+				background-color: #fff;
+				padding: 25rpx 0;
+				border-radius: 30rpx;
+
+				.nav-item {
+					width: 150rpx;
+					height: 150rpx;
+					text-align: center;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					gap: 6rpx;
+
+					.nav-img {
+						width: 85rpx;
+						height: 85rpx;
+					}
+
+					.nav-text {
+						font-size: 24rpx;
+					}
+				}
+			}
+
+			.point {
+				width: 100%;
+				height: 18px;
+				// background-color: #dd9734;
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				gap: 5rpx;
+
+				.p-black {
+					width: 16rpx;
+					height: 7rpx;
+					background-color: #4f4e4e;
+					border-radius: 80rpx;
+				}
+
+				.p-cc {
+					background-color: #ccc;
+					width: 10rpx;
+					height: 7rpx;
+					border-radius: 50%;
+				}
+			}
+		}
+	}
+	.main {
+		height: 100vh;
+		position: relative;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		.numFont {
+			font-family: "number-3156" !important;
+			letter-spacing: 0.001rem;
+		}
+		.scroll-Y {
+			height: 100vh;
+			-webkit-overflow-scrolling: touch;
+			overflow-y: auto;
+			position: relative;
+			transform: translateZ(0);
+			will-change: transform;
+		}
+
+		.section-two {
+			width: 100%;
+			height: 100vh;
+			position: absolute; // 改为fixed定位
+			top: 760rpx;
+			left: 0;
+			z-index: 1;
+			overflow: hidden;
+			.background-layer {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 10;
+				pointer-events: none;
+
+				&::before {
+					content: "";
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-size: 100% auto;
+					background-repeat: no-repeat;
+					background-position: center top;
+					transition: opacity 0.3s ease;
+					background-image: var(--slice-image);
+					opacity: var(--slice-opacity);
+				}
+
+				&::after {
+					content: "";
+					position: absolute;
+					top: var(--after-top, 0);
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-size: 100% auto;
+					background-repeat: no-repeat;
+					background-position: center top;
+					transition: opacity 0.3s ease, top 0.3s ease, background-image 0.3s ease;
+					background-image: var(--none-slice-image);
+					opacity: var(--none-slice-opacity);
+				}
+			}
+			.top-nav {
+				width: 98%;
+				position: absolute;
+				top: 90rpx;
+				z-index: 11;
+				overflow: hidden;
+				height: 90rpx;
+				.nav-list {
+					width: 108%;
+					display: flex;
+					flex-direction: row;
+					justify-content: flex-start;
+					position: relative;
+					.nav-item {
+						width: 160rpx;
+						height: 90rpx;
+						display: flex;
+						flex-direction: column;
+						justify-content: space-between;
+						align-items: center;
+						position: relative;
+						.new-img {
+							width: 40rpx;
+							height: 40rpx;
+						}
+						&:first-child {
+							justify-content: end;
+							.nav-text {
+								font-weight: 400;
+								color: #000;
+							}
+						}
+						&:last-child {
+							.new-img,
+							.nav-text {
+								position: relative;
+								&::after {
+									content: "";
+									position: absolute;
+									right: 0;
+									top: 0;
+									width: 280%;
+									height: 100%;
+									background: linear-gradient(
+										90deg,
+										rgba(0, 0, 0, 0) 30%,
+										rgb(57, 229, 177, 0.9) 90%,
+										rgb(57, 229, 177, 1) 100%
+									);
+									filter: blur(4px);
+									-webkit-filter: blur(4px);
+									pointer-events: none;
+								}
+							}
+						}
+					}
+				}
+			}
+			.top-title {
+				width: 100%;
+				position: fixed;
+				height: 70rpx;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+				background-color: #f6f5fa;
+				z-index: 9;
+				padding-top: 20rpx;
+				.t-all {
+					font-weight: 500;
+					color: #000;
+					font-size: 32rpx;
+				}
+			}
+
+			.new-contain {
+				width: 100%;
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding-top: 200rpx;
+				// padding-bottom: 150rpx;
+				.list {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+				}
+				.new-head {
+					width: 100%;
+					padding: 10rpx 46rpx 10rpx 46rpx;
+					height: 80rpx;
+					.t {
+						font-weight: 500;
+						font-size: 34rpx;
+					}
+				}
+				.list-head {
+					height: 90rpx;
+					position: sticky;
+					top: 70rpx;
+					z-index: 99;
+					background-color: #f6f5fa;
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					padding: 0 46rpx;
+					width: 100%;
+					transition: height 0.3s ease;
+					&.is_sticky {
+						height: 60rpx;
+					}
+
+					.t {
+						font-weight: bold;
+						font-size: 36rpx;
+					}
+
+					.current-m {
+						display: flex;
+						align-items: center;
+						gap: 10px;
+						.t-current-m {
+							font-weight: 300;
+							color: #0f122e;
+							font-size: 26rpx;
 						}
 					}
 
-					.jiangli {
-						width: 66%;
+					.sticky-icon {
+						opacity: 1;
+						transition: opacity 0.3s ease;
+					}
+				}
 
-						span {
-							font-weight: normal;
+				.card {
+					background-color: #fff;
+					width: 90%;
+					height: auto;
+					border-radius: 30rpx;
+					margin-bottom: 15rpx;
+					padding: 20rpx 30rpx;
+					z-index: 1;
+					.title {
+						display: flex;
+						flex-direction: row;
+						justify-content: flex-start;
+						align-items: center;
+						gap: 5rpx;
+						.t-h {
+							font-weight: 300;
 						}
 					}
 
 					.con {
-						.t-desc {
-							font-weight: 300;
+						display: flex;
+						flex-direction: row;
+						justify-content: flex-start;
+						align-items: center;
+						padding: 10rpx 0;
+						gap: 20rpx;
+						.left {
+							padding: 0;
+
+							.new-img {
+								width: 90rpx;
+								height: 90rpx;
+							}
+
+							.icon {
+								width: 60rpx;
+								height: 60rpx;
+							}
+							.circle-btn {
+								width: 65rpx;
+								height: 65rpx;
+								background-color: #e5edf7;
+								border-radius: 50%;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								font-size: 28rpx;
+								font-weight: bold;
+								color: #333;
+							}
+						}
+
+						.right {
+							padding: 0 0 0 0;
+							width: 100%;
+							display: flex;
+							flex-direction: row;
+							.l {
+								width: 66%;
+								.title {
+									.l-text {
+										// font-weight: bold;
+										font-size: 28rpx;
+									}
+
+									.new-icon {
+										width: 30rpx;
+										height: 30rpx;
+									}
+								}
+
+								.jiangli {
+									.l-text {
+										font-weight: normal;
+										line-height: 50rpx;
+									}
+								}
+
+								.desc {
+									.t-desc {
+										font-weight: 300;
+									}
+									.time {
+										font-weight: 300;
+										font-size: 24rpx;
+									}
+								}
+							}
+							.r {
+								width: 34%;
+								display: flex;
+								flex-direction: row;
+								justify-content: flex-end;
+								align-items: flex-start;
+
+								.m-t {
+									display: flex;
+									flex-direction: column;
+									justify-content: center;
+									align-items: center;
+									gap: 10rpx;
+									.m-desc {
+										display: flex;
+										flex-direction: row;
+										justify-content: center;
+										align-items: flex-end;
+										gap: 5rpx;
+										font-weight: bold;
+
+										.m-type {
+											font-size: 20rpx;
+											font-weight: 800;
+											line-height: 38rpx;
+										}
+										.money {
+											font-size: 34rpx;
+										}
+									}
+									.m-tip {
+										font-weight: 300;
+										font-size: 26rpx;
+									}
+								}
+								.desc {
+									width: 100%;
+									height: 100%;
+									display: flex;
+									flex-direction: row;
+									justify-content: flex-end;
+									align-items: center;
+									.auto-btn {
+										background-color: #39e4b1;
+										padding: 10rpx 20rpx;
+										border-radius: 30rpx;
+										font-size: 24rpx;
+										white-space: nowrap;
+									}
+								}
+								.jiang-box {
+									display: flex;
+									flex-direction: row;
+									justify-content: flex-end;
+									align-items: center;
+									background-color: #fdf4e0;
+									padding: 0 15rpx;
+									border-radius: 30rpx;
+									font-size: 24rpx;
+									white-space: nowrap;
+									gap: 10rpx;
+									margin-top: 5rpx;
+									.r-text {
+										font-size: 28rpx;
+										color: #dc9734;
+									}
+									.new-img {
+										width: 35rpx;
+										height: 35rpx;
+									}
+								}
+							}
+							.tip {
+								font-size: 28rpx;
+							}
+						}
+						.notice {
+							padding: 0 0 0 0;
+							width: 100%;
+
+							.title {
+								.title-text {
+									font-weight: bold;
+								}
+
+								.new-icon {
+									width: 30rpx;
+									height: 30rpx;
+								}
+							}
+
+							// .jiangli {
+							// 	width: 66%;
+
+							// 	span {
+							// 		font-weight: normal;
+							// 		line-height: 50rpx;
+							// 	}
+							// }
+
+							.desc {
+								.t-desc {
+									font-weight: 300;
+								}
+								.time {
+									font-weight: 300;
+									font-size: 24rpx;
+								}
+							}
 						}
 					}
 				}
-			}
-		}
 
-		.ad {
-			width: 90%;
-			height: 210rpx;
-			text-align: center;
-			margin: 15rpx 0;
-
-			.ad-img {
-				width: 100%;
-				height: 100%;
-			}
-		}
-	}
-}
-
-.tran {
-	position: absolute;
-	// right: 50rpx;
-	// top: 820rpx;
-	z-index: 1;
-	will-change: opacity;
-
-	.box {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 3rpx;
-
-		.tran-text {
-			font-size: 24rpx;
-			font-weight: bold;
-			will-change: opacity;
-		}
-
-		.tran-btn-container {
-			position: relative;
-			height: 160rpx;
-			width: 120rpx;
-
-			.fixed-circle {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				width: 50rpx;
-				height: 50rpx;
-				background-color: #f8d653;
-				border-radius: 50%;
-				opacity: 0;
-				transition: opacity 0.2s ease;
-				z-index: 1;
-				box-shadow: 0 0 8rpx rgba(248, 214, 83, 0.4);
-
-				&.show {
-					opacity: 1;
-				}
-			}
-
-			.liquid-connector {
-				position: absolute;
-				top: -150rpx;
-				left: 0;
-				width: 120rpx;
-				height: 460rpx;
-				pointer-events: none;
-				opacity: 0;
-				transition: opacity 0.2s ease;
-				z-index: 0;
-
-				&.show {
-					opacity: 1;
-				}
-
-				path {
-					transition: d 0.1s ease-out;
-					filter: drop-shadow(0 0 4px rgba(248, 214, 83, 0.3));
-					fill: #f8d653;
-				}
-			}
-
-			.tran-btn {
-				position: relative;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				height: 100%;
-				width: 100%;
-				z-index: 2;
-
-				.btn {
-					width: 120rpx; // 恢复原始大小
-					height: 120rpx; // 恢复原始大小
-					border-radius: 50%;
-					background-color: #f8d653;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					box-shadow: 0 0 10rpx rgba(248, 214, 83, 0.3);
-
-					.new-img {
-						width: 60rpx; // 恢复原始大小
-						height: 60rpx; // 恢复原始大小
-					}
-				}
-
-				.arrow-up,
-				.arrow-down {
-					height: 15rpx;
-					display: flex;
-					justify-content: center;
-					align-items: center;
+				.ad {
+					width: 90%;
+					text-align: center;
 					margin: 5rpx 0;
 				}
 			}
 		}
+		.tran-container {
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
+			z-index: 1;
+			will-change: opacity;
+			&.active {
+				pointer-events: auto;
+				background-color: rgba(255, 255, 255, 0.67); // 使用 rgba 替代 #fffa
+			}
+			&.completed {
+				--float-scale: 99;
+			}
+			&.completed .main-btn {
+				transition: transform 0.8s linear;
+			}
+			.connection-line {
+				pointer-events: auto;
+				position: absolute;
+				height: 100rpx;
+				transform-origin: 0 50%;
+				color: var(--float-background-color);
+
+				image {
+					width: 100%;
+					height: 100%;
+					object-fit: contain; // 确保图片比例正确
+				}
+			}
+
+			.origin-point {
+				width: 60rpx;
+				height: 60rpx;
+			}
+		}
+	}
+
+	.guid {
+		position: fixed; /* 添加固定定位 */
+		width: 100%;
+		height: 100vh;
+		background: url("/static/3156/img/1-0.jpg") no-repeat top center;
+		background-size: 100% auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		overflow: hidden;
+
+		.login-box {
+			width: 100%;
+			position: fixed;
+			bottom: 200rpx;
+			height: 120rpx;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			gap: 20rpx;
+			.login-btn {
+				width: 75%;
+				height: 100rpx;
+				border-radius: 50rpx;
+				background-color: #3cf5bd;
+				text-align: center;
+				.btn-t {
+					line-height: 100rpx;
+					font-weight: 800;
+					font-size: 36rpx;
+				}
+			}
+		}
+	}
+
+	.main-btn {
+		pointer-events: auto;
+		position: absolute;
+		width: 120rpx;
+		height: 120rpx;
+		background-color: var(--float-background-color);
+		border-radius: 50%;
+		transition: var(--float-transition);
+		.icon {
+			width: 100%;
+			height: 100%;
+			font-size: 48rpx;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			.tran-guid {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				transform: rotate(-90deg);
+
+				image {
+					width: 50%;
+					height: 50%;
+					object-fit: contain; // 确保图片比例正确
+				}
+			}
+			.tran-text {
+				font-size: 24rpx;
+				font-weight: bold;
+				will-change: opacity;
+			}
+			.tran-text-wrapper {
+				position: absolute;
+				width: 120rpx;
+				height: 70rpx;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				gap: 5rpx;
+				.up {
+					width: 30rpx;
+					height: 30rpx;
+					transform: rotate(180deg);
+					bottom: -5rpx;
+					opacity: 0.3;
+				}
+				.down {
+					width: 30rpx;
+					height: 30rpx;
+					top: -5rpx;
+					opacity: 0.3;
+				}
+				&.tran-out {
+					top: -66rpx;
+				}
+
+				&.tran-in {
+					bottom: -66rpx;
+				}
+			}
+		}
 	}
 }
 
-// 添加过渡动画
-.tran-btn {
-	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-	will-change: transform;
-
-	&:active {
-		transform: scale(0.98);
-	}
-}
-
-.container {
-	position: fixed;
-	top: 0rpx;
-	right: 0;
+.edit-dialog {
 	width: 100vw;
-	height: 100vh;
-	pointer-events: none;
-	--float-scale: 1;
-	--float-background-color: #f3d76a;
-}
-
-.container.active {
-	pointer-events: initial;
-	background-color: #fffa;
-}
-
-.container.completed {
-	--float-scale: 99;
-}
-
-.main-btn {
-	pointer-events: initial;
-	position: absolute;
-	width: 120rpx;
-	height: 120rpx;
-	background-color: var(--float-background-color);
-	border-radius: 50%;
-	transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-
-.main-btn .icon {
-	width: 100%;
-	height: 100%;
-	font-size: 48rpx;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.main-btn .icon .tran-guid {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	transform: rotate(-90deg);
-
-	image {
-		width: 50%;
-		height: 50%;
-	}
-}
-
-.main-btn .icon .tran-text {
-	font-size: 24rpx;
-	font-weight: bold;
-	will-change: opacity;
-}
-
-.main-btn .icon .tran-text-wrapper {
-	position: absolute;
-	width: 100%;
+	background: #fff;
+	border-radius: 20rpx;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	max-height: 100vh;
+	position: relative;
 
-	&.tran-out {
-		top: -56rpx;
+	.edit-tabs {
+		height: 60rpx;
 	}
-
-	&.tran-in {
-		bottom: -56rpx;
+	.edit-header {
+		padding: 30rpx 30rpx 0;
+		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 10rpx;
+		.yue-title-tabs {
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+		}
+		.edit-title {
+			font-size: 32rpx;
+			font-weight: bold;
+			text-align: center;
+		}
 	}
-}
-
-.container.completed .main-btn {
-	transition: transform 0.8s linear;
-}
-
-.direction-top {
-	position: absolute;
-	top: -10rpx;
-}
-
-.direction-bottom {
-	position: absolute;
-	bottom: -10rpx;
-}
-
-.origin-point {
-	width: 60rpx;
-	height: 60rpx;
-}
-
-.connection-line {
-	pointer-events: initial;
-	position: absolute;
-	height: 100rpx;
-	transform-origin: 0 50%;
-	color: var(--float-background-color);
-
-	image {
+	.scroll-Y {
+		height: 100vh;
+		-webkit-overflow-scrolling: touch;
+		overflow-y: auto;
+		position: relative;
+		transform: translateZ(0);
+		will-change: transform;
+	}
+	.edit-content {
+		padding: 0 30rpx 140rpx 30rpx;
+		box-sizing: border-box;
 		width: 100%;
-		height: 100%;
+		overflow: hidden;
+		.yue-list {
+			height: 100vh;
+			overflow: hidden;
+			.yue-item {
+				height: 100rpx;
+				border-radius: 20rpx;
+				margin-bottom: 10rpx;
+				.yue-item-title {
+					font-size: 28rpx;
+				}
+			}
+		}
+
+		.edit-item {
+			padding: 20rpx 0;
+			// border-bottom: 1rpx solid #cecccc;
+			margin-bottom: 20rpx;
+			width: 100%;
+			.item {
+				height: 70rpx;
+				margin-bottom: 10rpx;
+			}
+		}
+	}
+
+	.edit-footer {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 30rpx;
+		display: flex;
+		justify-content: space-between;
+		flex-shrink: 0;
+		border-top: 1rpx solid #eee;
+		background: #fff;
+		z-index: 1;
+
+		.edit-btn {
+			width: 45%;
+			height: 80rpx;
+			line-height: 80rpx;
+			text-align: center;
+			border-radius: 40rpx;
+			font-size: 28rpx;
+
+			&.cancel {
+				background: #f5f5f5;
+				color: #666;
+			}
+
+			&.confirm {
+				background: #007aff;
+				color: #fff;
+			}
+		}
 	}
 }
 </style>

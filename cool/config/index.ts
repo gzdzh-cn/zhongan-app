@@ -36,7 +36,7 @@ export const config = {
 	test: {
 		token: "",
 		mock: false,
-		eps: true,
+		eps: false,
 	},
 
 	// 忽略

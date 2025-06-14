@@ -3,7 +3,7 @@
     "abiFilters": [
       "arm64-v8a"
     ],
-    "appName": "ZA Blank",
+    "appName": "ZA Bank",
     "applicationAttrs": [],
     "buildFeatures": [],
     "composeCompilerVersion": "1.5.1",
@@ -31,10 +31,12 @@
       1
     ],
     "plist": {},
+    "podSources": [],
     "signingConfig": {
       "development": {},
       "release": {}
-    }
+    },
+    "staticPods": []
   },
   "uniSdk": {
     "android": "/Volumes/disk/site/Dcloud/Android-SDK@4.57.82388_20250321/SDK"

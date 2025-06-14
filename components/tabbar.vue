@@ -6,7 +6,7 @@
 				v-for="(item, index) in list"
 				:key="index"
 				:class="{
-					'is-active': item.active,
+					is_active: item.active,
 				}"
 				@tap="toLink(item.pagePath)"
 			>
@@ -32,21 +32,35 @@
 import { computed } from "vue";
 import { useCool } from "/@/cool";
 
+const props = defineProps({
+	isAtTop: {
+		type: Boolean,
+		default: false
+	}
+});
+
 const { router } = useCool();
 
 const list = computed(() => {
 	const arr = [...router.tabs];
-
-	return arr.map((e) => {
+	const newArr = arr.map((e, index) => {
 		const active = router.path?.includes(e.pagePath);
+		let iconPath:string = "/" + (active ? e.selectedIconPath : e.iconPath);
+		
+		// 当 isAtTop 为 true 且是第一个图标时，使用 home-2.png
+		if (props.isAtTop && index === 0) {
+			iconPath = "/static/3156/img/home-2.png";
+		}
 
 		return {
-			icon: "/" + (active ? e.selectedIconPath : e.iconPath),
+			icon: iconPath,
 			active,
 			number: 0,
 			...e,
 		};
 	});
+	
+	return newArr
 });
 
 function toLink(pagePath: string) {
@@ -65,10 +79,10 @@ uni.hideTabBar();
 <style lang="scss" scoped>
 .tabbar {
 	padding-bottom: env(safe-area-inset-bottom);
-	height: 120rpx;
+	height: 100rpx;
 
 	&__inner {
-		padding-top: 10px;
+		padding-top: 0px;
 		padding-bottom: inherit;
 		height: inherit;
 		width: 100%;
@@ -91,6 +105,7 @@ uni.hideTabBar();
 			.icon {
 				height: 46rpx;
 				width: 46rpx;
+				transition: all 0.3s ease;
 
 				image {
 					height: 100%;
@@ -122,9 +137,31 @@ uni.hideTabBar();
 				box-sizing: border-box;
 			}
 
-			&.is-active {
+			&.is_active {
+				position: relative;
+				
+				&::before {
+					content: '';
+					position: absolute;
+					top: -30rpx;
+					left: 50%;
+					transform: translateX(-50%);
+					width: 140rpx;
+					height: 60rpx;
+					background-color: #fff;
+					border-radius: 70rpx 70rpx 0 0;
+					z-index: -1;
+				}
+
+				.icon {
+					height: 70rpx;
+					width: 70rpx;
+					transform: translateY(-15rpx);
+				}
+
 				.label {
-					color: $cl-color-primary;
+					color: $cl-color-success;
+					transform: translateY(-10rpx);
 				}
 			}
 

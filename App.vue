@@ -23,6 +23,7 @@ export default {
 @import 'tailwindcss/base';
 @import 'tailwindcss/utilities';
 @import "/@/static/font/iconfont.css";
+@import "/@/static/3156/index.scss";
 @import "/@/static/3156/font/iconfont.css";
 @import "/@/uni_modules/vk-uview-ui/index.scss"; 
 .hoverClass{

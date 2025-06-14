@@ -3,7 +3,6 @@ import { ref } from "vue";
 import { useCool } from "/@/cool";
 import {  storage } from "/@/cool/utils";
  
-const { service } = useCool();
 // 本地缓存
 const data = storage.info();
 
@@ -15,14 +14,7 @@ const useSettingStore = defineStore("setting", function () {
 	// 获取用户信息
 	async function get() {
    
-		return await service.cms.setting.info({ id: 1 })
-			.then((res) => {
-				if (res) {
-					set(res);
-				}
-				return res;
-			})
-		 
+		return 
 	}
 
 	// 设置用户信息
@@ -36,6 +28,7 @@ const useSettingStore = defineStore("setting", function () {
  
 		info,
 		get,
+		set
  
 	};
 });

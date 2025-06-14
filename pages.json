@@ -16,6 +16,44 @@
 				"navigationBarTitleText": "我的",
 				"navigationStyle":"custom"
 			}
+		},
+		{
+			"path" : "pages/index/transfer",
+			"style" : 
+			{
+				"navigationBarTitleText" : "转账",
+				"navigationStyle":"custom"
+			}
+		},
+		{
+			"path" : "pages/index/pay",
+			"style" : 
+			{
+				"navigationBarTitleText" : "支付",
+				"navigationStyle":"custom"
+			}
+		},
+		{
+			"path" : "pages/index/tranAfter",
+			"style" : 
+			{
+				"navigationBarTitleText" : "转账中",
+				"navigationStyle":"custom"
+			}
+		},
+		{
+			"path" : "pages/index/tansou",
+			"style" : 
+			{
+				"navigationBarTitleText" : "探索"
+			}
+		},
+		{
+			"path" : "pages/index/touzi",
+			"style" : 
+			{
+				"navigationBarTitleText" : "投资"
+			}
 		}
 
 	],
@@ -133,15 +171,27 @@
 		"list": [
 			{
 				"pagePath": "pages/index/home",
-				"iconPath": "static/icon/tabbar/home.png",
-				"selectedIconPath": "static/icon/tabbar/home2.png",
+				"iconPath": "static/3156/img/icon2.png",
+				"selectedIconPath": "static/3156/img/icon2.png",
 				"text": "首页"
 			},
 			{
+				"pagePath": "pages/index/tansou",
+				"iconPath": "static/3156/img/nav2-icon.png",
+				"selectedIconPath": "static/3156/img/nav2-icon.png",
+				"text": "探索"
+			},
+			{
+				"pagePath": "pages/index/touzi",
+				"iconPath": "static/3156/img/nav3-icon.png",
+				"selectedIconPath": "static/3156/img/nav3-icon.png",
+				"text": "投资"
+			},
+			{
 				"pagePath": "pages/index/my",
-				"iconPath": "static/icon/tabbar/my.png",
-				"selectedIconPath": "static/icon/tabbar/my2.png",
-				"text": "我的"
+				"iconPath": "static/3156/img/nav4-icon.png",
+				"selectedIconPath": "static/3156/img/nav4-icon.png",
+				"text": "账户"
 			}
 		]
 	}
