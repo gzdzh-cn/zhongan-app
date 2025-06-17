@@ -1,7 +1,7 @@
 <template>
 	<cl-page backgroundColor="#f6f5fa">
 		<view class="main-con">
-			<view class="nav">
+			<view class="nav" :style="navStyle">
 				<view class="head-l" @click="back">
 					<uni-icons type="arrow-left" size="26"></uni-icons>
 				</view>
@@ -183,11 +183,19 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const statusBarHeight = ref(0);
+let appTop = 0;
+// #ifdef APP
+appTop = 40;
+// #endif
 
 const { router, storage } = useCool();
 const { userInfo, tranInfo } = dzhStore();
 const uToastRef = ref();
 const mcs = ref({ background: "rgba(0, 0, 0, 0.2)" });
+const navStyle = computed(() => ({
+	top: statusBarHeight.value + appTop + "rpx",
+}));
 
 const formData = reactive<FormData>({
 	money: "",
@@ -299,7 +307,6 @@ const circleStyle = (index: number) => {
 	};
 };
 
-
 const btnList = ["即時", "預設", "定期"];
 const activeBtnIndex = ref(0);
 
@@ -333,6 +340,10 @@ const getTransferInitial = (name: string): string => {
 	return name.charAt(0).toUpperCase();
 };
 
+onLoad(() => {
+	const systemInfo = uni.getSystemInfoSync();
+	statusBarHeight.value = systemInfo.statusBarHeight || 0;
+});
 onMounted(() => {
 	windowWidth.value = uni.getSystemInfoSync().windowWidth;
 	// 获取btn-box的宽度
@@ -369,14 +380,8 @@ onLoad((options: any) => {});
 		align-items: center;
 		position: fixed;
 		background-color: #fff;
-		/* #ifdef APP */
-		top: 70rpx;
-		/* #endif */
-		/* #ifndef APP */
-		top: 0;
-		/* #endif */
 		left: 0;
-		// z-index: 999;
+
 		.head-l {
 			width: 120rpx;
 		}

@@ -261,20 +261,25 @@
 import { computed, onMounted, reactive, ref, nextTick } from "vue";
 import { useCool } from "/@/cool";
 import { dzhStore, Contact } from "/@/dzh";
-import { onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
+import { throttle } from "lodash-es";
+
 
 const { router, storage } = useCool();
-const { tranInfo, userInfo } = dzhStore();
+const { tranInfo, userInfo, originContactList } = dzhStore();
 const state = reactive({
 	screenWidth: 0,
 	isFixed: false,
 });
 const hanLogin = ref(false);
-let appTop = 30; // section-two的初始top值（rpx）
+const statusBarHeight = ref(0);
+let appTop = 0;
 // #ifdef APP
-// 根据平台调整高度比例
-appTop = 60;
+appTop = 40;
 // #endif
+ 
+
+
 const loading = ref(false);
 const toLink = (param: any) => {
 	loading.value = true;
@@ -283,10 +288,11 @@ const toLink = (param: any) => {
 		router.push(param);
 	}, 500);
 };
+// 编辑按钮样式
 const editStyle = computed(() => ({
 	position: "fixed",
 	right: "50rpx",
-	top: appTop + "px",
+	top: statusBarHeight.value + appTop + 40 + "rpx",
 	zIndex: "999",
 }));
 
@@ -327,116 +333,7 @@ const circleStyle = (index: number) => {
 };
 
 // 定义联系人数据
-const CONTACTS_DATA = ref<Contact[]>([
-	{
-		id: 1,
-		name: "AU-YEUNG Y** C****",
-		type: "手机号码",
-		colorNum: 0,
-		phoneNumber: "+852-54420110",
-		receiveBankName: "387 众安银行(ZA Bank)",
-		receiveBankAccount: "1234567890",
-		isIcon: true,
-		sort: 0,
-		isTop: false,
-	},
-	{
-		id: 2,
-		name: "AU-YEUNG K*** H*",
-		type: "手机号码",
-		colorNum: 1,
-		phoneNumber: "jeffreynavy0325@gmal.com",
-		receiveBankName: "387 众安银行(ZA Bank)",
-		receiveBankAccount: "1234567890",
-		isIcon: true,
-		sort: 0,
-		isTop: false,
-	},
-	{
-		id: 3,
-		name: "BATALLA E**** M*******",
-		type: "手机号码",
-		colorNum: 0,
-		phoneNumber: "+852-95310588",
-		receiveBankName: "预设收款银行",
-		receiveBankAccount: "1234567890",
-		isIcon: false,
-		sort: 0,
-		isTop: false,
-	},
-	{
-		id: 4,
-		name: "CHAN Y* H**",
-		type: "手机号码",
-		colorNum: 0,
-		phoneNumber: "+852-90292318",
-		receiveBankName: "387 众安银行(ZA Bank)",
-		receiveBankAccount: "1234567890",
-		isIcon: false,
-		sort: 0,
-		isTop: false,
-	},
-	{
-		id: 5,
-		name: "DON...",
-		type: "手机号码",
-		colorNum: 4,
-		phoneNumber: "+852-84821434",
-		receiveBankName: "预设收款银行",
-		receiveBankAccount: "852-84821434",
-		isIcon: false,
-		sort: 1,
-		isTop: true,
-	},
-	{
-		id: 6,
-		name: "LEUNG W*...",
-		type: "手机号码",
-		colorNum: 2,
-		phoneNumber: "+852-84821434",
-		receiveBankName: "预设收款银行",
-		receiveBankAccount: "1234567890",
-		isIcon: false,
-		sort: 2,
-		isTop: true,
-	},
-	{
-		id: 7,
-		name: "WONG T*...",
-		type: "手机号码",
-		colorNum: 4,
-		phoneNumber: "+852-84821434",
-		receiveBankName: "预设收款银行",
-		receiveBankAccount: "1234567890",
-		isIcon: false,
-		sort: 3,
-		isTop: true,
-	},
-	{
-		id: 8,
-		name: "LO K*** M***",
-		type: "手机号码",
-		colorNum: 0,
-		phoneNumber: "+852-84821434",
-		receiveBankName: "预设收款银行",
-		receiveBankAccount: "1234567890",
-		isIcon: false,
-		sort: 4,
-		isTop: true,
-	},
-	{
-		id: 9,
-		name: "BUNSIT K***M**",
-		type: "手机号码",
-		colorNum: 0,
-		phoneNumber: "+852-84821434",
-		receiveBankName: "预设收款银行",
-		receiveBankAccount: "1234567890",
-		isIcon: false,
-		sort: 0,
-		isTop: false,
-	},
-]);
+const CONTACTS_DATA = ref<Contact[]>(originContactList);
 
 // 定义导航数据
 const NAV_LIST = ref([
@@ -546,14 +443,17 @@ const saveEdit = () => {
 	tranInfo.set(CONTACTS_DATA.value);
 };
 
+// 导航栏样式
 const navStyle = computed(() => ({
 	backgroundColor: state.isFixed ? "#fff" : "transparent",
+	top: statusBarHeight.value + appTop + "rpx",
 }));
 const back = () => {
 	router.back();
 };
 
 const scrollTop = ref(0);
+ 
 // 添加滚动事件处理函数
 const upper = (e: any) => {
 	console.log("滚动到顶部");
@@ -562,7 +462,8 @@ const upper = (e: any) => {
 const lower = (e: any) => {
 	console.log("滚动到底部");
 };
-const scroll = (e: any) => {
+
+const scroll = throttle((e: any) => {
 	const currentScrollTop = e.detail.scrollTop;
 	scrollTop.value = currentScrollTop;
 	if (scrollTop.value > 0) {
@@ -570,22 +471,8 @@ const scroll = (e: any) => {
 	} else {
 		state.isFixed = false;
 	}
-};
+}, 200);
 
-onMounted(() => {});
-onShow(() => {
-	console.log("onShow");
-	console.log(userInfo.info);
-
-	if (userInfo.info?.password != "") {
-		hanLogin.value = true;
-	}
-	if (tranInfo?.info?.length > 0) {
-		CONTACTS_DATA.value = tranInfo.info;
-	} else {
-		tranInfo.set(CONTACTS_DATA.value);
-	}
-});
 
 const scrollToId = ref("");
 
@@ -618,6 +505,26 @@ const deleteContact = (index: number) => {
 		},
 	});
 };
+
+
+onLoad(() => {
+	const systemInfo = uni.getSystemInfoSync();
+	statusBarHeight.value = systemInfo.statusBarHeight || 0;
+});
+onMounted(() => {});
+onShow(() => {
+	console.log("onShow");
+ 
+	if (userInfo.info?.password != "") {
+		hanLogin.value = true;
+	}
+	if (tranInfo?.info?.length > 0) {
+		CONTACTS_DATA.value = tranInfo.info;
+	} else {
+		tranInfo.set(CONTACTS_DATA.value);
+	}
+});
+
 </script>
 
 <style lang="less" scoped>
@@ -635,12 +542,6 @@ const deleteContact = (index: number) => {
 		justify-content: space-between;
 		align-items: center;
 		position: fixed;
-		/* #ifdef APP */
-		top: 70rpx;
-		/* #endif */
-		/* #ifndef APP */
-		top: 0;
-		/* #endif */
 		left: 0;
 		z-index: 999;
 		.head-l {

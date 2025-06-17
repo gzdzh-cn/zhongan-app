@@ -27,7 +27,11 @@ interface ListItem {
 	title?: string;
 	transferType?: string; // 转账类型
 	transferName?: string; // 转账名称
-	img?: string;
+	img?: {
+		url: string;
+		extname: string;
+		name: string;
+	}[];
 	icon?: string;
 	content?: string;
 	desc?: string;

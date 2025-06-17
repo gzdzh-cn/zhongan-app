@@ -90,18 +90,13 @@ import { onLoad, onReady, onShow } from "@dcloudio/uni-app";
 import { useApp, useCool, useStore, useWx } from "/@/cool";
 
 import { dzhStore, UserInfo } from "/@/dzh";
+import { originUserData } from "/@/dzh/store/data";
+import { isEmpty } from "lodash";
 
 const { router, storage } = useCool();
 const { userInfo } = dzhStore();
 const loading = ref(false);
-const userData = ref<UserInfo>({
-	username: userInfo.info?.username,
-	password: "",
-	avatar: userInfo.info?.avatar,
-	desc: userInfo.info?.desc || "可用活期余额：HKD 23,628.18，今日可转账限额：HKD267,010.00",
-	money: userInfo.info?.money || 0,
-	isIcon: userInfo.info?.isIcon || false,
-});
+const userData = ref<UserInfo>({});
 const logoSrc = ref("/static/3156/img/avtar.png");
 const inputType = ref("password");
 
@@ -124,9 +119,18 @@ const login = () => {
 		router.home();
 	}, 500);
 };
-
+onLoad(() => {
+ 
+	if (isEmpty(userInfo.info)) {
+		userInfo.resetData();
+	}
+	userData.value = JSON.parse(JSON.stringify(userInfo.info));
+	console.log("onLoad",userInfo.info);
+});
 onReady(() => {});
-onShow(() => {});
+onShow(() => {
+	console.log("onShow",userInfo.info);
+});
 
 onLoad(() => {});
 </script>

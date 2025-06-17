@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
- 
+import { originMonthList } from "/@/dzh/store/data";
 import {  storage } from "/@/cool/utils";
  
  
@@ -12,7 +12,9 @@ const useTranFlowInfotore = defineStore("tranFlowInfo", function () {
  
 	const info = ref(data.tranFlowInfo);
 
- 
+	function resetData() {
+		set(originMonthList);
+	}
 	// async function get() {
     //     return 
  
@@ -20,7 +22,6 @@ const useTranFlowInfotore = defineStore("tranFlowInfo", function () {
 
 	// 设置用户信息
 	function set(value: any) {
-        console.log("set",value);
 		info.value = value;
 		storage.set("tranFlowInfo", value);
 	}
@@ -29,7 +30,8 @@ const useTranFlowInfotore = defineStore("tranFlowInfo", function () {
 	return {
  
 		info,
-        set
+        set,
+		resetData
  
 	};
 });

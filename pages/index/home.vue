@@ -103,7 +103,12 @@
 					</view>
 				</view>
 
-				<view class="section-two" :style="sectionTwoStyle">
+				<view
+					class="section-two"
+					:style="sectionTwoStyle"
+					@touchstart="stHandleTouchStart"
+					@touchend="stHandleTouchEnd"
+				>
 					<scroll-view
 						:scroll-top="scrollTop"
 						:scroll-y="isAtTop"
@@ -113,6 +118,7 @@
 						@scroll="scroll"
 					>
 						<view class="background-layer" :style="backgroundStyle"> </view>
+						<!-- 第二屏导航 -->
 						<view class="top-nav" v-show="isAtTop">
 							<view class="nav-list">
 								<view class="nav-item">
@@ -175,7 +181,7 @@
 											</view>
 											<view class="con">
 												<view class="left">
-													<image :src="item.img" mode="aspectFit" class="new-img" />
+													<image :src="doSrc(item)" mode="aspectFit" class="new-img" />
 												</view>
 												<view class="notice">
 													<view class="title">
@@ -193,26 +199,12 @@
 										<view class="card" v-else-if="item.type === 'normal'">
 											<view class="con">
 												<view class="left">
-													<image
-														:src="item.img"
-														mode="aspectFit"
-														class="new-img icon"
-														v-if="!item.isTransfer"
-													/>
-													<view class="circle-btn" v-if="item.isTransfer">{{
-														getTransferInitial(item.transferName || "")
-													}}</view>
+													<image :src="doSrc(item)" mode="aspectFit" class="new-img icon" />
 												</view>
 												<view class="right">
 													<view class="l">
-														<view
-															class="title"
-															:class="{ jiangli: item.reward, transfer: item.isTransfer }"
-														>
-															<text class="l-text" v-if="!item.isTransfer">{{ item.title }}</text>
-															<text class="l-text" v-else
-																>{{ item.transferType }} {{ item.transferName }}</text
-															>
+														<view class="title" :class="{ jiangli: item.reward }">
+															<text class="l-text">{{ item.title }}</text>
 														</view>
 														<view class="desc">
 															<text class="time">{{ item.time }}</text>
@@ -222,61 +214,6 @@
 														<view class="jiang-box" v-if="item.reward">
 															<text class="r-text">{{ item.reward }}</text>
 															<image :src="item.rewardImg" mode="aspectFit" class="new-img" />
-														</view>
-														<view class="m-t" v-if="item.money">
-															<view class="m-desc">
-																<text class="m-type">{{ item.moneyType }}</text>
-																<text class="money">{{ item.money }}</text>
-															</view>
-															<text class="m-tip">{{ item.tip }}</text>
-														</view>
-														<view class="tip" v-if="item.tipText">{{ item.tipText }}</view>
-														<view class="desc" v-if="item.autoBtn">
-															<view class="auto-btn">{{ item.autoBtn }}</view>
-														</view>
-													</view>
-												</view>
-											</view>
-										</view>
-										<view class="card" v-else-if="item.type === 'money'">
-											<view class="con">
-												<view class="left">
-													<image
-														:src="item.img"
-														mode="aspectFit"
-														class="new-img icon"
-														v-if="!item.isTransfer"
-													/>
-													<view class="circle-btn" v-if="item.isTransfer">{{
-														getTransferInitial(item.transferName || "")
-													}}</view>
-												</view>
-												<view class="right">
-													<view class="l">
-														<view
-															class="title"
-															:class="{ jiangli: item.reward, transfer: item.isTransfer }"
-														>
-															<text class="l-text" v-if="!item.isTransfer">{{ item.title }}</text>
-															<text class="l-text" v-else
-																>{{ item.transferType }} {{ item.transferName }}</text
-															>
-														</view>
-														<view class="desc">
-															<text class="time">{{ item.time }}</text>
-														</view>
-													</view>
-													<view class="r">
-														<view class="jiang-box" v-if="item.reward">
-															<text class="r-text">{{ item.reward }}</text>
-															<image :src="item.rewardImg" mode="aspectFit" class="new-img" />
-														</view>
-														<view class="m-t" v-if="item.money">
-															<view class="m-desc">
-																<text class="m-type">{{ item.moneyType }}</text>
-																<text class="money">{{ item.money }}</text>
-															</view>
-															<text class="m-tip">{{ item.tip }}</text>
 														</view>
 														<view class="tip" v-if="item.tipText">{{ item.tipText }}</view>
 														<view class="desc" v-if="item.autoBtn">
@@ -287,9 +224,62 @@
 											</view>
 										</view>
 
+										<view class="card" v-else-if="item.type === 'money'">
+											<view class="con">
+												<!-- 左侧图标 -->
+												<view class="left">
+													<image
+														:src="doSrc(item)"
+														mode="aspectFit"
+														class="new-img icon"
+														v-if="item.isInterest"
+													/>
+													<view class="circle-btn" v-if="!item.isInterest">{{
+														getTransferInitial(item.transferName || "")
+													}}</view>
+												</view>
+												<!-- 右侧内容 -->
+												<view class="right">
+													<view class="l">
+														<!-- 标题 -->
+														<view class="title">
+															<!-- 标题图标 -->
+															<image
+																:src="item.icon"
+																mode="aspectFit"
+																class="new-icon"
+																v-if="item.icon && item.isInterest"
+															/>
+															<!-- 标题文字 -->
+															<text class="l-text" v-if="item.isInterest">{{ item.title }}</text>
+
+															<!-- 交易类型和名称 -->
+															<text class="l-text" v-if="!item.isInterest"
+																>{{ item.transferType }} {{ item.transferName }}</text
+															>
+														</view>
+														<!-- 时间 -->
+														<view class="desc">
+															<text class="time">{{ item.time }}</text>
+														</view>
+													</view>
+
+													<view class="r">
+														<view class="m-t">
+															<view class="m-desc">
+																<text class="m-type">{{ item.moneyType }}</text>
+																<text class="money">{{ item.money }}</text>
+															</view>
+															<text class="m-tip">{{ item.tip }}</text>
+														</view>
+													</view>
+												</view>
+											</view>
+										</view>
+
 										<!-- 广告卡片 -->
 										<view class="ad" v-else-if="item.type === 'ad'">
-											<image :src="item.img" mode="fill" class="ad-img" :style="item.style" />
+											<image :src="doSrc(item)" mode="fill" class="ad-img" :style="item.style" />
 										</view>
 									</template>
 								</template>
@@ -454,48 +444,91 @@
 								class="edit-item"
 							>
 								<view class="item">
-									<u-input
+									<view class="item-title"><text class="item-title-text">类型:</text></view>
+									<uni-data-select
 										v-model="item.type"
-										placeholder="类型(消息/普通/广告/交易)"
-										disabled
-										:border="true"
-									/>
+										:localdata="typeRange"
+										@change="changeType($event, item)"
+									></uni-data-select>
+								</view>
+								<view
+									class="item"
+									v-if="
+										item.type == 'message' ||
+										item.type == 'normal' ||
+										(item.type == 'money' && item.isInterest)
+									"
+								>
+									<view class="item-title"><text class="item-title-text">左侧图标:</text></view>
+
+									<uni-file-picker
+										title="选择图片"
+										v-model="item.img"
+										limit="1"
+										file-mediatype="image"
+										@select="selectFile($event, item)"
+									></uni-file-picker>
 								</view>
 								<view class="item" v-if="item.type != 'ad' && item.type != 'message'">
-									<u-input v-model="item.title" placeholder="标题" :border="true" />
+									<view class="item-title"><text class="item-title-text">标题:</text></view>
+									<u-input v-model="item.title" type="textarea" placeholder="标题" :border="true" />
 								</view>
 
 								<view class="item" v-if="item.type == 'message'">
-									<u-input v-model="item.content" placeholder="副标题" :border="true" />
+									<view class="item-title"><text class="item-title-text">副标题:</text></view>
+									<u-input
+										v-model="item.content"
+										type="textarea"
+										placeholder="副标题"
+										:border="true"
+									/>
 								</view>
 								<view class="item" v-if="item.type === 'message'">
-									<u-input v-model="item.desc" placeholder="描述" :border="true" />
+									<view class="item-title"><text class="item-title-text">描述:</text></view>
+									<u-input v-model="item.desc" type="textarea" placeholder="描述" :border="true" />
 								</view>
+
 								<view class="item" v-if="item.type != 'ad'">
+									<view class="item-title"><text class="item-title-text">时间:</text></view>
 									<u-input v-model="item.time" placeholder="时间" :border="true" />
 								</view>
 
 								<view class="item" v-if="item.type === 'money'">
+									<view class="item-title"><text class="item-title-text">金额:</text></view>
 									<u-input v-model="item.money" placeholder="金额" :border="true" />
 								</view>
 								<view class="item" v-if="item.type === 'money'">
+									<view class="item-title"><text class="item-title-text">金额类型:</text></view>
 									<u-input v-model="item.moneyType" placeholder="金额类型" :border="true"
 								/></view>
-								<view class="item" v-if="item.type === 'money'"
-									><u-input
+								<view class="item" v-if="item.type === 'money' && !item.isInterest">
+									<view class="item-title"><text class="item-title-text">提示词:</text></view>
+									<u-input
 										v-model="item.tip"
 										placeholder="提示词"
 										v-if="item.type === 'money'"
 										:border="true"
 								/></view>
-								<view class="item" v-if="item.type === 'normal'"
-									><u-input
+								<view class="item" v-if="item.type === 'money'">
+									<view class="item-title"><text class="item-title-text">是否派息:</text></view>
+									<switch
+										:checked="item.isInterest"
+										@change="switch1Change($event, item)"
+										color="#FFCC33"
+										style="transform: scale(0.7)"
+									/>
+								</view>
+
+								<view class="item" v-if="item.type === 'normal'">
+									<view class="item-title"><text class="item-title-text">右侧提示词:</text></view>
+									<u-input
 										v-model="item.tipText"
 										placeholder="右侧提示词"
 										v-if="item.type === 'normal'"
 										:border="true"
 								/></view>
 								<view class="item" v-if="item.type === 'normal'">
+									<view class="item-title"><text class="item-title-text">右侧提示词2:</text></view>
 									<u-input
 										v-model="item.autoBtn"
 										placeholder="右侧提示词2"
@@ -503,7 +536,20 @@
 										:border="true"
 									/>
 								</view>
+
+								<view class="item" v-if="item.type == 'ad'">
+									<view class="item-title"><text class="item-title-text">广告图:</text></view>
+									<uni-file-picker
+										title="选择图片"
+										v-model="item.img"
+										limit="1"
+										file-mediatype="image"
+										@select="selectFile($event, item)"
+									></uni-file-picker>
+								</view>
+
 								<view class="item">
+									<view class="item-title"><text class="item-title-text">排序:</text></view>
 									<u-input v-model="item.sort" placeholder="排序" :border="true" />
 								</view>
 
@@ -520,29 +566,44 @@
 						<view class="edit-content">
 							<view class="edit-item">
 								<view class="item">
+									<view class="item-title"><text class="item-title-text">姓名:</text></view>
 									<u-input v-model="userData.username" placeholder="请输入姓名" :border="true"
 								/></view>
 								<view class="item">
+									<view class="item-title"><text class="item-title-text">头像:</text></view>
 									<u-input v-model="userData.avatar" placeholder="请输入号码" :border="true"
 								/></view>
 								<view class="item">
-									<u-input v-model="userData.desc" placeholder="请输入余额描述" :border="true"
+									<view class="item-title"><text class="item-title-text">余额描述:</text></view>
+									<u-input
+										v-model="userData.desc"
+										type="textarea"
+										placeholder="请输入余额描述"
+										:border="true"
 								/></view>
 								<view class="item">
+									<view class="item-title"><text class="item-title-text">余额:</text></view>
 									<u-input v-model="userData.money" placeholder="请输入余额" :border="true"
 								/></view>
 								<view class="item">
-									<u-input v-model="userData.errorMsg" placeholder="请输入错误信息" :border="true"
+									<view class="item-title"><text class="item-title-text">错误信息:</text></view>
+									<u-input
+										v-model="userData.errorMsg"
+										type="textarea"
+										placeholder="请输入错误信息"
+										:border="true"
 								/></view>
 							</view>
 						</view>
 					</scroll-view>
 				</template>
 				<view class="edit-footer">
-					<button class="edit-btn cancel" @click="showEditPopup = false">取消</button>
-					<button class="edit-btn confirm" @click="saveEditMonthList">保存</button>
+					<u-button @click="resetData" type="error" shape="circle">重置</u-button>
+					<u-button @click="showEditPopup = false" shape="circle">取消</u-button>
+					<u-button @click="saveEditMonthList" type="primary" shape="circle">保存</u-button>
 				</view>
 			</view>
+			<cl-confirm ref="ConfirmRef"></cl-confirm>
 		</u-popup>
 
 		<tabbar :isAtTop="isAtTop" />
@@ -551,28 +612,42 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, getCurrentInstance, nextTick } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import Tabbar from "/@/components/tabbar.vue";
 import { dzhStore, MonthList, UserInfo } from "/@/dzh";
 import { router } from "/@/cool";
+import { isEmpty, throttle } from "lodash";
 
-const { userInfo, tranFlowInfo } = dzhStore();
+const ConfirmRef = ref();
+const { userInfo, tranFlowInfo, tranInfo, originUserData, originMonthList } = dzhStore();
 const touchStartY = ref(0);
 const currentOffset = ref(0); // 当前偏移
 const isAnimating = ref(false);
-const UP_THRESHOLD = 10; // 上滑阈值
+const UP_THRESHOLD = 5; // 上滑阈值
 const DOWN_THRESHOLD = 5; // 下滑阈值
 const isAtTop = ref(false); // 是否在顶部位置
 const hanLogin = ref(true);
 const logoSrc = ref(hanLogin.value ? "/static/3156/img/avtar.png" : "/static/3156/img/avtar.png");
-let appTop = 90; // section-two的初始top值（rpx）
+const state = reactive({
+	originX: 0,
+	originY: 0,
+	currentX: 0,
+	currentY: 0,
+	isDragging: false,
+	maxDistance: 160,
+	completed: false,
+	screenWidth: 0,
+});
+const statusBarHeight = ref(0);
+
+let sectionTop = 90; // section-two的初始top值（rpx）
 // #ifdef APP
 // 根据平台调整高度比例
-appTop = 160;
+sectionTop = 145;
 // #endif
 const viewportWidth = ref(uni.getSystemInfoSync().windowWidth);
 // 计算section-two的初始位置到顶部的距离
-const INITIAL_TOP_DISTANCE = 760 - appTop; // section-two的初始top值（rpx）
+const INITIAL_TOP_DISTANCE = 760 - sectionTop; // section-two的初始top值（rpx）
 const INITIAL_TOP_DISTANCE_PX = (INITIAL_TOP_DISTANCE * viewportWidth.value) / 750; // 转换为px
 
 // 修改TOP_POSITION的计算方式，确保不会超过初始位置
@@ -616,245 +691,20 @@ appBottom = 250;
 // #endif
 
 const newContainStyle = computed(() => ({
-	zIndex: showTopTile.value ? "8" : "11",
+	zIndex: isAtTop.value ? "8" : "11",
 	paddingBottom: `${appBottom}rpx`,
 }));
-
-const state = reactive({
-	originX: 0,
-	originY: 0,
-	currentX: 0,
-	currentY: 0,
-	isDragging: false,
-	maxDistance: 160,
-	completed: false,
-	screenWidth: 0,
-});
-
-const rpx2px = (value: number) => {
-	return (value * state.screenWidth) / 750;
-};
-
-const px2rpx = (value: number) => {
-	return (value * 750) / state.screenWidth;
-};
-// 水滴效果按钮圆
-const mainButtonStyle = computed(() => {
-	if (hanLogin.value) {
-		return {
-			transform: `translate(${px2rpx(state.currentX) - 60}rpx, ${
-				px2rpx(state.currentY) - 60
-			}rpx) scale(var(--float-scale))`,
-			transition: state.isDragging ? "none" : "",
-		};
-	}
-	if (!hanLogin.value) {
-		return {
-			position: "static" as const,
-		};
-	}
-});
-
-// 水滴效果小圆点
-const originPointStyle = computed(() => ({
-	transform: `translate(${px2rpx(state.originX) - 30}rpx, ${px2rpx(state.originY) - 30}rpx)`,
-}));
-// 水滴容器
-const connectionStyle = computed(() => {
-	const dx = state.currentX - state.originX;
-	const dy = state.currentY - state.originY;
-	const distance = Math.sqrt(dx * dx + dy * dy);
-	const angle = Math.atan2(dy, dx);
-	return {
-		width: `${px2rpx(distance)}rpx`,
-		transform: `translate(${px2rpx(state.originX)}rpx, ${px2rpx(
-			state.originY - 25
-		)}rpx) rotate(${angle}rad)`,
-	};
-});
-
-// 水滴长度
-const distance = computed(() => {
-	return Number(connectionStyle.value.width.replace("rpx", ""));
-});
-
-// 水滴液化svg效果
-const connectSvgIcon = computed(() => {
-	// 这段代码是动态生成一个SVG图标，并将其转换为base64编码的数据URL
-	const width = rpx2px(Math.ceil(distance.value * 100) / 100); // 将rpx单位的距离转换为px，并四舍五入到两位小数
-	// 创建SVG字符串，定义一个自适应宽度的SVG图形
-	// viewBox设置为动态宽度和固定高度50
-	// 绘制一个填充为黄色(#f3d76a)的路径，形成一个类似连接线或箭头的形状
-	// 路径使用贝塞尔曲线(Q命令)创建平滑的曲线效果
-	// 路径会根据width动态调整大小，保持视觉上的连贯性
-	const svg = `
-		<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${width} 50">
-			<path fill="#f3d76a" d="M 0 10 L 0 40 Q ${width / 2} 20, ${width} 50 L ${width} 0 Q ${
-		width / 2
-	} 30, 0 10 Z"></path>
-		</svg>
-		`;
-	// 将SVG转换为base64编码的数据URL，可以直接用于img标签的src属性
-	return `data:image/svg+xml;base64,${btoa(svg)}`;
-});
-// 按钮svg图标
-const tranGuidSvgIcon = computed(() => {
-	const svg = `
-		<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48">
-			<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-				stroke-width="4" d="M42 19H6M30 7l12 12M6.799 29h36m-36 0l12 12" />
-		</svg>
-		`;
-	return `data:image/svg+xml;base64,${btoa(svg)}`;
-});
-// 按钮文字
-const tranTextWrapperStyle = computed(() => {
-	return {
-		opacity: 1 - Math.min(distance.value / 10, 1),
-	};
-});
-// 按钮位置初始化
-const initPosition = () => {
-	const { screenWidth, windowHeight } = uni.getSystemInfoSync();
-	state.screenWidth = screenWidth;
-	state.originX = (screenWidth / 5) * 4.2;
-	let heightRatio = 0;
-	// #ifdef APP
-	// 根据平台调整高度比例
-	heightRatio = 0.59;
-	// #endif
-	// #ifndef APP
-	// 根据平台调整高度比例
-	heightRatio = 0.59;
-	// #endif
-	state.originY = windowHeight * heightRatio;
-	state.currentX = state.originX;
-	state.currentY = state.originY;
-};
-// 按钮触摸
-const onTouchStart = () => {
-	state.isDragging = true;
-};
-// 按钮触摸
-const onTouchMove = (e: TouchEvent) => {
-	if (!state.isDragging) return;
-	const touch = e.touches[0];
-
-	let newX = state.originX;
-	let newY = touch.clientY;
-
-	const dx = newX - state.originX;
-	const dy = newY - state.originY;
-	const distance = Math.sqrt(dx * dx + dy * dy);
-
-	if (distance > state.maxDistance) {
-		newX = state.originX + (dx * state.maxDistance) / distance;
-		newY = state.originY + (dy * state.maxDistance) / distance;
-	}
-
-	state.currentX = newX;
-	state.currentY = newY;
-};
-// 按钮触摸
-const onTouchEnd = () => {
-	state.isDragging = false;
-	const offset = rpx2px(distance.value);
-
-	if (offset > state.maxDistance - 10) {
-		state.completed = true;
-		setTimeout(() => {
-			uni.navigateTo({
-				url: "/pages/index/transfer",
-				// animationType: "slide-in-right",
-				// animationDuration: 200,
-				success: (res) => {},
-				fail: () => {},
-				complete: () => {
-					state.completed = false;
-					state.currentX = state.originX;
-					state.currentY = state.originY;
-				},
-			});
-		}, 400);
-	} else {
-		state.currentX = state.originX;
-		state.currentY = state.originY;
-	}
-};
-
-// 首页下部分滚动
-const topTitle = computed(() => {
-	return {
-		display: showTopTile.value ? "flex" : "none",
-	};
-});
-const scrollTop = ref(0);
-const showTopTile = ref(false);
-
-// 添加滚动事件处理函数
-const upper = (e: any) => {
-	console.log("滚动到顶部");
-};
-
-const lower = (e: any) => {
-	console.log("滚动到底部");
-};
-const maxIndex = ref(0);
-const stickyStates = ref<boolean[]>([]);
-
-// 判断某个 list-head 是否在顶部
-const isSticky = (index: number) => {
-	return stickyStates.value[index];
-};
-
-// 修改 scroll 函数
-const scroll = (e: any) => {
-	const currentScrollTop = e.detail.scrollTop;
-	scrollTop.value = currentScrollTop;
-
-	nextTick(() => {
-		// 使用 uni.createSelectorQuery 获取元素位置
-		const query = uni.createSelectorQuery();
-		monthList.value.forEach((_, index) => {
-			query.select(`#list-head-${index}`).boundingClientRect((rect: any) => {
-				if (rect) {
-					// 70rpx 转换为 px
-					const stickyThreshold = rpx2px(70);
-					stickyStates.value[index] = rect.top <= stickyThreshold;
-				}
-			});
-		});
-	});
-
-	if (scrollTop.value > rpx2px(70)) {
-		showTopTile.value = true;
-	} else {
-		showTopTile.value = false;
-	}
-};
-
-const logout = () => {
-	userInfo.set({
-		username: userInfo.info?.username,
-		password: "",
-		desc: userInfo.info?.desc || "可用活期余额：HKD 23,628.18，今日可转账限额：HKD267,010.00",
-		money: userInfo.info?.money || 1547434,
-		isIcon: userInfo.info?.isIcon || false,
-		errorMsg: userInfo.info?.errorMsg || "付款账户状态异常，该交易未能处理。请于工作时间内联系我们",
-	});
-	hanLogin.value = false;
-};
-
 // 屏幕触摸
 const handleTouchStart = (e: TouchEvent) => {
-	if (isAnimating.value || showEditPopup.value) return;
+	if (isAnimating.value || showEditPopup.value || scrollTop.value > 0) return;
+	// console.log("handleTouchStart scrollTop",scrollTop.value);
 	touchStartY.value = e.touches[0].clientY;
 	isAnimating.value = false;
 };
 // 屏幕触摸
-const handleTouchMove = (e: TouchEvent) => {
-	if (isAnimating.value || showEditPopup.value) return;
-
+const handleTouchMove = throttle((e: TouchEvent) => {
+	// console.log("handleTouchMove isUpper",isUpper.value);
+	if (isAnimating.value || showEditPopup.value || scrollTop.value > 0) return;
 	const deltaY = e.touches[0].clientY - touchStartY.value;
 	const nextOffset = currentOffset.value + deltaY;
 
@@ -879,7 +729,7 @@ const handleTouchMove = (e: TouchEvent) => {
 			isAnimating.value = false;
 		}, 300);
 	}
-	if (isAtTop.value && deltaY > DOWN_THRESHOLD) {
+	if (!isUpper.value && isAtTop.value && deltaY > DOWN_THRESHOLD) {
 		// 在顶部下滑超过5px，回到初始位置
 		isAnimating.value = true;
 		currentOffset.value = INITIAL_POSITION;
@@ -890,10 +740,10 @@ const handleTouchMove = (e: TouchEvent) => {
 	}
 
 	touchStartY.value = e.touches[0].clientY;
-};
+}, 200);
 // 屏幕触摸
 const handleTouchEnd = () => {
-	if (isAnimating.value || showEditPopup.value) return;
+	if (isAnimating.value || showEditPopup.value || scrollTop.value > 0) return;
 
 	isAnimating.value = true;
 	const deltaY = currentOffset.value - INITIAL_POSITION;
@@ -905,46 +755,21 @@ const handleTouchEnd = () => {
 	} else if (!isAtTop.value && Math.abs(deltaY) > UP_THRESHOLD && deltaY < 0) {
 		// 上滑超过10px，吸附到顶部
 		currentOffset.value = TOP_POSITION;
-		isAtTop.value = true;
 	} else if (!isAtTop.value) {
 		// 未达到阈值，回到初始位置
 		currentOffset.value = INITIAL_POSITION;
 		isAtTop.value = false;
 	}
-
+	isUpper.value = false;
 	setTimeout(() => {
 		isAnimating.value = false;
 	}, 300);
 };
 
-const tranOpacity = computed(() => {
-	const progress = Math.abs(currentOffset.value) / 20; // 渐变范围
-	return Math.max(0, 1 - progress);
-});
-
-const tranStyle = computed(() => ({
-	opacity: tranOpacity.value,
-	transition: isAnimating.value ? "opacity 0.3s ease" : "none",
-	display: tranOpacity.value == 0 ? "none" : "block",
-}));
-
-// tran 按钮移动相关状态
-const tranCurrentY = ref(0);
-// tran 文本透明度计算
-const tranTextOpacity = computed(() => {
-	const progress = Math.abs(tranCurrentY.value) / 20;
-	return Math.max(0, 1 - progress);
-});
-
-const tranTextStyle = computed(() => ({
-	opacity: tranTextOpacity.value,
-	transition: "opacity 0.3s ease",
-}));
-
-// 添加存款金额变量
-const depositAmount = computed(() => {
-	return userInfo.info?.money ?? 0;
-});
+//////////////////// 首页下部分滚动相关方法 ////////////////////
+const scrollTop = ref(0); //滚动距离
+const showTopTile = ref(false); //是否显示顶部标题
+const isUpper = ref(false); //是否滚动到顶部
 
 // 第二屏导航
 const navItems = ref([
@@ -954,7 +779,6 @@ const navItems = ref([
 	{ img: "/static/3156/img/baoxian-icon.png", name: "保险" },
 	{ img: "/static/3156/img/jijin-icon.png", name: "基金" },
 ]);
-
 // 第一屏导航
 const navList = [
 	{
@@ -990,164 +814,11 @@ const navList = [
 		text: "全部",
 	},
 ];
-
 // 全局控制变量
 const useRandomTime = ref(false);
-
-// 月份数组改为计算属性
-const monthArray = ref(["本月", "5月", "4月"]);
-
-// 静态默认数据改为计算属性
-const defaultMonthList = ref<MonthList>([
-	{
-		month: monthArray.value[0],
-		list: [
-			// {
-			// 	type: "message",
-			// 	img: "/static/3156/img/new-1.png",
-			// 	title: "消息(+14)",
-			// 	icon: "/static/3156/img/new-icon.png",
-			// 	content: "「最佳销售」基金排行榜更新了",
-			// 	desc: "查看过往3个月最受欢迎的基金。投资...",
-			// 	sort: 1,
-			// 	time: "6月15日 14:30",
-			// },
-			{
-				type: "normal",
-				img: "/static/3156/img/icon1.png",
-				title: "有 2 个新用户专属任务在等你！即刻做任务赚丰富奖...",
-				time: "6月15日 13:20",
-				reward: "赚奖赏",
-				rewardImg: "/static/3156/img/t_27.png",
-				sort: 2,
-			},
-			{
-				type: "money",
-				img: "/static/3156/img/t_28.png",
-				title: "港元- 派息",
-				time: "6月1日 01:28",
-				moneyType: "+HKD",
-				money: "0.40",
-				isInterest: true,
-				sort: 3,
-			},
-			// {
-			// 	type: "ad",
-			// 	img: "/static/3156/img/ad1.png",
-			// 	style: "width: 100%; height: 210rpx",
-			// 	sort: 4,
-			// },
-		],
-	},
-	{
-		month: monthArray.value[1],
-		list: [
-			{
-				type: "message",
-				img: "/static/3156/img/t_31.jpg",
-				title: "消息(+14)",
-				icon: "/static/3156/img/t_32.jpg",
-				content: "31/5 截止！领高达 HKD 880！",
-				desc: "不要错过领高达 HKD 880 的最后机会...",
-				sort: 1,
-				time: "6月15日 14:30",
-			},
-			{
-				type: "ad",
-				img: "/static/3156/img/ad3.png",
-				style: "width: 100%; height: 210rpx",
-				sort: 2,
-			},
-			{
-				type: "money",
-				img: "/static/3156/img/t_28.png",
-				title: "港元- 派息",
-				time: "5月1日 01:28",
-				moneyType: "+HKD",
-				money: "0.39",
-				isInterest: true,
-				sort: 3,
-			},
-			// {
-			// 	type: "normal",
-			// 	img: "/static/3156/img/icon2.png",
-			// 	title: "成功用新设备登录",
-			// 	time: "5月9日 00:35",
-			// 	sort: 1,
-			// },
-			// {
-			// 	type: "normal",
-			// 	img: "/static/3156/img/icon2.png",
-			// 	title: "签到成功",
-			// 	time: "5月7日 11:34",
-			// 	tipText: "爆肌 Alfle",
-			// 	sort: 2,
-			// },
-			// {
-			// 	type: "ad",
-			// 	img: "/static/3156/img/ad2.jpg",
-			// 	style: "width: 460rpx; height: 150rpx",
-			// 	sort: 3,
-			// },
-		],
-	},
-	{
-		month: monthArray.value[2],
-		list: [
-			{
-				type: "normal",
-				img: "/static/3156/img/icon2.png",
-				title: "签到成功",
-				time: "4月2日 00:55",
-				tipText: "爆肌 Alfle",
-				sort: 2,
-			},
-			{
-				type: "normal",
-				img: "/static/3156/img/icon2.png",
-				title: "成功用新设备登录",
-				time: "4月2日 00:30",
-				sort: 1,
-			},
-
-			{
-				type: "money",
-				img: "/static/3156/img/t_28.png",
-				title: "港元- 派息",
-				time: "4月1日 01:28",
-				moneyType: "+HKD",
-				money: "0.18",
-				isInterest: true,
-				sort: 3,
-			},
-			// {
-			// 	type: "money",
-			// 	img: "/static/3156/img/icon2.png",
-			// 	transferType: "转给",
-			// 	transferName: "HEN Z******",
-			// 	time: "4月30日 11:34",
-			// 	moneyType: "-HKD",
-			// 	money: "50.00",
-			// 	tip: "成功入账",
-			// 	isTransfer: true,
-			// 	sort: 1,
-			// },
-			// {
-			// 	type: "normal",
-			// 	img: "/static/3156/img/diyuee-icon.png",
-			// 	title: "低余额提示",
-			// 	time: "4月1日 00:34",
-			// 	autoBtn: "自动增值",
-			// 	sort: 3,
-			// },
-		],
-	},
-]);
-
+const defaultMonthList = ref<MonthList>([]);
 // 修改 monthListEditable 的初始化
-// const monthListEditable = ref(JSON.parse(JSON.stringify(defaultMonthList.value)));
 const monthListEditable = computed(() => defaultMonthList.value);
-
 // 修改 monthList 计算属性
 const monthList = computed(() => {
 	if (!useRandomTime.value) {
@@ -1170,83 +841,272 @@ const monthList = computed(() => {
 	}));
 });
 
-// 添加生成随机时间的函数
-const generateRandomTime = (month: number): string => {
-	const now = new Date();
-	const currentMonth = now.getMonth() + 1;
-	const currentDay = now.getDate();
-	const currentHour = now.getHours();
-	const currentMinute = now.getMinutes();
+// 首页下部分滚动
+let topTitleTop = 0;
+// #ifdef APP
+topTitleTop = 20;
+// #endif
+const topTitle = computed(() => {
+	return {
+		display: isAtTop.value ? "flex" : "none",
+		top: Number(statusBarHeight.value - topTitleTop) + "rpx",
+	};
+});
+// 首页第二屏滚动监听开始
+const stHandleTouchStart = (e: any) => {
+	if (!isAtTop.value || !isUpper.value) return;
+	// console.log("stHandleTouchStart");
+};
+// 首页第二屏滚动监听结束
+const stHandleTouchEnd = (e: any) => {
+	if (!isAtTop.value || isUpper.value) return;
+};
 
-	// 获取月份的天数
-	const daysInMonth = new Date(2024, month, 0).getDate();
+// 添加滚动事件处理函数
+const upper = (e: any) => {
+	console.log("滚动到顶部");
+	isUpper.value = true;
+	showTopTile.value = false;
+};
+const lower = (e: any) => {
+	console.log("滚动到底部");
+};
+const maxIndex = ref(0);
+const stickyStates = ref<boolean[]>([]);
+// 判断某个 list-head 是否在顶部
+const isSticky = (index: number) => {
+	return stickyStates.value[index];
+};
+// 修改 scroll 函数
+const scroll = throttle((e: any) => {
+    if (!isAtTop.value) return;
+    const currentScrollTop = e.detail.scrollTop;
+    scrollTop.value = currentScrollTop;
+    isUpper.value = false;
+    // 70rpx 转换为 px
+    const stickyThreshold = rpx2px(statusBarHeight.value + 150);
+    
+    nextTick(() => {
+        // 使用 uni.createSelectorQuery 获取元素位置
+        const query = uni.createSelectorQuery();
+        query
+            .selectAll(".list-head")
+            .boundingClientRect((rects: any) => {
+                if (rects) {
+                    // 更新所有元素的 sticky 状态
+                    stickyStates.value = rects.map((rect: any) => rect.top <= stickyThreshold);
+                    // 找出最后一个吸顶的元素的索引
+                    maxIndex.value = stickyStates.value.lastIndexOf(true);
+                }
+            })
+            .exec();
+    });
 
-	// 如果是当前月份，限制日期不超过今天
-	let maxDay = daysInMonth;
-	if (month === currentMonth) {
-		maxDay = currentDay;
+    if (scrollTop.value < rpx2px(70)) {
+        showTopTile.value = false;
+    }
+}, 500);
+
+//////////////////// 首页下部分滚动相关方法 ////////////////////
+
+//////////////////// 水滴效果相关方法 ////////////////////
+
+// 水滴效果按钮圆
+const mainButtonStyle = computed(() => {
+	if (hanLogin.value) {
+		return {
+			transform: `translate(${px2rpx(state.currentX) - 60}rpx, ${
+				px2rpx(state.currentY) - 60
+			}rpx) scale(var(--float-scale))`,
+			transition: state.isDragging ? "none" : "",
+		};
+	}
+	if (!hanLogin.value) {
+		return {
+			position: "static" as const,
+		};
+	}
+});
+// 水滴效果小圆点
+const originPointStyle = computed(() => ({
+	transform: `translate(${px2rpx(state.originX) - 30}rpx, ${px2rpx(state.originY) - 30}rpx)`,
+}));
+// 水滴容器
+const connectionStyle = computed(() => {
+	const dx = state.currentX - state.originX;
+	const dy = state.currentY - state.originY;
+	const distance = Math.sqrt(dx * dx + dy * dy);
+	const angle = Math.atan2(dy, dx);
+	return {
+		width: `${px2rpx(distance)}rpx`,
+		transform: `translate(${px2rpx(state.originX)}rpx, ${px2rpx(
+			state.originY - 25
+		)}rpx) rotate(${angle}rad)`,
+	};
+});
+// 水滴长度
+const distance = computed(() => {
+	return Number(connectionStyle.value.width.replace("rpx", ""));
+});
+// tran 水滴液化svg效果
+const connectSvgIcon = computed(() => {
+	// 这段代码是动态生成一个SVG图标，并将其转换为base64编码的数据URL
+	const width = rpx2px(Math.ceil(distance.value * 100) / 100); // 将rpx单位的距离转换为px，并四舍五入到两位小数
+	// 创建SVG字符串，定义一个自适应宽度的SVG图形
+	// viewBox设置为动态宽度和固定高度50
+	// 绘制一个填充为黄色(#f3d76a)的路径，形成一个类似连接线或箭头的形状
+	// 路径使用贝塞尔曲线(Q命令)创建平滑的曲线效果
+	// 路径会根据width动态调整大小，保持视觉上的连贯性
+	const svg = `
+		<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${width} 50">
+			<path fill="#f3d76a" d="M 0 10 L 0 40 Q ${width / 2} 20, ${width} 50 L ${width} 0 Q ${
+		width / 2
+	} 30, 0 10 Z"></path>
+		</svg>
+		`;
+	// 将SVG转换为base64编码的数据URL，可以直接用于img标签的src属性
+	return `data:image/svg+xml;base64,${btoa(svg)}`;
+});
+// tran 按钮svg图标
+const tranGuidSvgIcon = computed(() => {
+	const svg = `
+		<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48">
+			<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+				stroke-width="4" d="M42 19H6M30 7l12 12M6.799 29h36m-36 0l12 12" />
+		</svg>
+		`;
+	return `data:image/svg+xml;base64,${btoa(svg)}`;
+});
+// tran 按钮文字
+const tranTextWrapperStyle = computed(() => {
+	return {
+		opacity: 1 - Math.min(distance.value / 10, 1),
+	};
+});
+// tran 容器样式
+const tranOpacity = computed(() => {
+	const progress = Math.abs(currentOffset.value) / 20; // 渐变范围
+	return Math.max(0, 1 - progress);
+});
+// tran容器样式
+const tranStyle = computed(() => ({
+	opacity: tranOpacity.value,
+	transition: isAnimating.value ? "opacity 0.3s ease" : "none",
+	display: tranOpacity.value == 0 ? "none" : "block",
+}));
+// tran 按钮移动相关状态
+const tranCurrentY = ref(0);
+// tran 文本透明度计算
+const tranTextOpacity = computed(() => {
+	const progress = Math.abs(tranCurrentY.value) / 20;
+	return Math.max(0, 1 - progress);
+});
+// tran 文本样式
+const tranTextStyle = computed(() => ({
+	opacity: tranTextOpacity.value,
+	transition: "opacity 0.3s ease",
+}));
+// tran 水滴按钮位置初始化
+const initPosition = () => {
+	const { screenWidth, windowHeight } = uni.getSystemInfoSync();
+	state.screenWidth = screenWidth;
+	state.originX = (screenWidth / 5) * 4.2;
+	let heightRatio = 0.59;
+
+	state.originY = windowHeight * heightRatio;
+	state.currentX = state.originX;
+	state.currentY = state.originY;
+};
+// tran 水滴按钮触摸
+const onTouchStart = () => {
+	state.isDragging = true;
+};
+// tran 水滴按钮触摸
+const onTouchMove = (e: TouchEvent) => {
+	if (!state.isDragging) return;
+	const touch = e.touches[0];
+
+	let newX = state.originX;
+	let newY = touch.clientY;
+
+	const dx = newX - state.originX;
+	const dy = newY - state.originY;
+	const distance = Math.sqrt(dx * dx + dy * dy);
+
+	if (distance > state.maxDistance) {
+		newX = state.originX + (dx * state.maxDistance) / distance;
+		newY = state.originY + (dy * state.maxDistance) / distance;
 	}
 
-	// 生成随机日期
-	const day = Math.floor(Math.random() * maxDay) + 1;
+	state.currentX = newX;
+	state.currentY = newY;
+};
+// tran 水滴按钮触摸
+const onTouchEnd = () => {
+	state.isDragging = false;
+	const offset = rpx2px(distance.value);
 
-	// 如果是当前月份且是今天，限制时间不超过当前时间
-	let maxHour = 24;
-	let maxMinute = 60;
-	if (month === currentMonth && day === currentDay) {
-		maxHour = currentHour;
-		maxMinute = currentMinute;
+	if (offset > state.maxDistance - 10) {
+		state.completed = true;
+		setTimeout(() => {
+			uni.navigateTo({
+				url: "/pages/index/transfer",
+				success: (res) => {},
+				fail: () => {},
+				complete: () => {
+					state.completed = false;
+					state.currentX = state.originX;
+					state.currentY = state.originY;
+				},
+			});
+		}, 400);
+	} else {
+		state.currentX = state.originX;
+		state.currentY = state.originY;
 	}
-
-	// 生成随机时间
-	const hour = Math.floor(Math.random() * maxHour);
-	const minute = Math.floor(Math.random() * maxMinute);
-
-	return `${month}月${day}日 ${hour.toString().padStart(2, "0")}:${minute
-		.toString()
-		.padStart(2, "0")}`;
 };
-
-// 添加获取首字母的计算属性
-const getTransferInitial = (name: string): string => {
-	if (!name) return "";
-	return name.charAt(0).toUpperCase();
-};
-
-// 添加数字格式化函数
-const formatNumber = (num: number): string => {
-	return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
+//////////////////// 水滴效果相关方法 ////////////////////
 
 //////////////////// 编辑弹窗相关方法 ////////////////////
 
 const tabsList = ref([{ name: "月份" }, { name: "数据" }, { name: "我的" }]);
 const tabsIndex = ref(0);
 const showEditPopup = ref(false);
+const typeRange = ref([
+	{ text: "消息", value: "message" },
+	{ text: "普通", value: "normal" },
+	{ text: "广告", value: "ad" },
+	{ text: "交易", value: "money" },
+]);
+const changeType = (e: any, item: any) => {
+	console.log(e, item);
+	item.type = e;
+};
+const switch1Change = (e: any, item: any) => {
+	console.log(e, item);
+	item.isInterest = e.detail.value;
+};
+
+let appTop = 0;
+// #ifdef APP
+appTop = 40;
+// #endif
+
+// 编辑按钮样式
+const editStyle = computed(() => ({
+	position: "fixed",
+	right: "50rpx",
+	top: Number(statusBarHeight.value) + appTop + 40 + "rpx",
+	zIndex: "999",
+}));
 
 //个人资料
 const currentEditMonthIndex = ref(0);
-const userData = ref<UserInfo>({
-	username: "llt888999",
-	password: "",
-	avatar: "",
-	desc: "可用活期余额：HKD 47,434.97,今日可转账限额：HKD200,000.00",
-	money: 47434.97,
-	isIcon: false,
-	errorMsg: "付款账户状态异常，该交易未能处理。请于工作时间内联系我们",
-});
-
+const userData = ref<UserInfo>({});
 // 个人资料
 
-let appTop_ = 0;
-// #ifdef APP
-appTop_ = 120;
-// #endif
-// #ifndef APP
-appTop_ = 90;
-// #endif
 const editDialogStyle = computed(() => ({
-	padding: `${appTop - appTop_}px 0 0 0`,
+	padding: `${Number(statusBarHeight.value) + 20}rpx 0 0 0`,
 }));
 
 const addItem = () => {
@@ -1289,12 +1149,20 @@ const removeMonth = () => {
 		currentEditMonthIndex.value = 0;
 	}
 };
-const editStyle = computed(() => ({
-	position: "fixed",
-	right: "50rpx",
-	top: appTop - appTop_ + 30 + "px",
-	zIndex: "999",
-}));
+
+const selectFile = (e: any, item: any) => {
+	item.img = [
+		{
+			url: e.tempFilePaths[0],
+			extname: e.tempFilePaths[0].split(".").pop(),
+			name: e.tempFilePaths[0].split("/").pop(),
+		},
+	];
+};
+
+const doSrc = (item: any) => {
+	return item.img?.[0]?.url;
+};
 
 const saveEditMonthList = () => {
 	useRandomTime.value = false;
@@ -1310,7 +1178,7 @@ const saveEditMonthList = () => {
 	userInfo.set(userData.value);
 	tranFlowInfo.set(defaultMonthList.value);
 };
-
+// 跳转登录
 const toLogin = () => {
 	uni.navigateTo({
 		url: "/pages/user/login",
@@ -1318,34 +1186,137 @@ const toLogin = () => {
 			hanLogin.value = true;
 		},
 	});
-	hanLogin.value = true;
 };
+// 给默认数据
+const setData = () => {
+	userInfo.resetData();
+	tranFlowInfo.resetData();
+	tranInfo.resetData();
+	console.log("setData userInfo", userInfo.info);
+	// console.log("setData tranFlowInfo", tranFlowInfo.info);
+};
+// 重置数据
+const resetData = () => {
+	ConfirmRef.value?.open({
+		title: "温馨提示",
+		message: "你确定要重置数据吗？",
+		callback(action: string) {
+			switch (action) {
+				case "confirm":
+					setData();
+					hanLogin.value = false;
+					showEditPopup.value = false;
+					break;
 
-onMounted(() => {
-	initPosition();
-	stickyStates.value = new Array(monthList.value.length).fill(false);
-	console.log(userInfo.info);
-	userInfo.set(userData.value);
-	tranFlowInfo.set(defaultMonthList.value);
+				default:
+					break;
+			}
+		},
+	});
+};
+//////////////////// 编辑弹窗相关方法 ////////////////////
+
+// 添加存款金额变量
+const depositAmount = computed(() => {
+	return userInfo.info?.money ?? 0;
+});
+// 退出
+const logout = () => {
+	userInfo.set({
+		username: userInfo.info?.username,
+		password: "",
+		desc: userInfo.info?.desc || "可用活期余额：HKD 23,628.18，今日可转账限额：HKD267,010.00",
+		money: userInfo.info?.money || 1547434,
+		isIcon: userInfo.info?.isIcon || false,
+		errorMsg: userInfo.info?.errorMsg || "付款账户状态异常，该交易未能处理。请于工作时间内联系我们",
+	});
+	hanLogin.value = false;
+};
+onLoad(() => {
+	console.log("onLoad");
+	if (isEmpty(userInfo.info)) {
+		setData();
+	}
+	const systemInfo = uni.getSystemInfoSync();
+	statusBarHeight.value = systemInfo.statusBarHeight || 0;
 });
 
 onShow(() => {
-	console.log("onShow", userInfo.info?.password);
+	console.log("onShow");
 
+	if (userInfo.info?.password == "") {
+		hanLogin.value = false;
+		return;
+	}
 	if (userInfo.info?.password != "") {
-		console.log("onShow 不空");
 		hanLogin.value = true;
 		userData.value = JSON.parse(JSON.stringify(userInfo.info));
 		if (tranFlowInfo.info) {
 			defaultMonthList.value = JSON.parse(JSON.stringify(tranFlowInfo.info));
+			// console.log("tranFlowInfo", tranFlowInfo.info);
 		}
 	}
-	if (userInfo.info?.password == "") {
-		console.log("onShow 空");
-		hanLogin.value = false;
-		return;
-	}
 });
+
+onMounted(() => {
+	console.log("onMounted");
+	initPosition();
+	stickyStates.value = new Array(monthList.value.length).fill(false);
+});
+
+const rpx2px = (value: number) => {
+	return (value * state.screenWidth) / 750;
+};
+
+const px2rpx = (value: number) => {
+	return (value * 750) / state.screenWidth;
+};
+
+// 添加生成随机时间的函数
+const generateRandomTime = (month: number): string => {
+	const now = new Date();
+	const currentMonth = now.getMonth() + 1;
+	const currentDay = now.getDate();
+	const currentHour = now.getHours();
+	const currentMinute = now.getMinutes();
+
+	// 获取月份的天数
+	const daysInMonth = new Date(2024, month, 0).getDate();
+
+	// 如果是当前月份，限制日期不超过今天
+	let maxDay = daysInMonth;
+	if (month === currentMonth) {
+		maxDay = currentDay;
+	}
+
+	// 生成随机日期
+	const day = Math.floor(Math.random() * maxDay) + 1;
+
+	// 如果是当前月份且是今天，限制时间不超过当前时间
+	let maxHour = 24;
+	let maxMinute = 60;
+	if (month === currentMonth && day === currentDay) {
+		maxHour = currentHour;
+		maxMinute = currentMinute;
+	}
+
+	// 生成随机时间
+	const hour = Math.floor(Math.random() * maxHour);
+	const minute = Math.floor(Math.random() * maxMinute);
+
+	return `${month}月${day}日 ${hour.toString().padStart(2, "0")}:${minute
+		.toString()
+		.padStart(2, "0")}`;
+};
+// 添加获取首字母的计算属性
+const getTransferInitial = (name: string): string => {
+	if (!name) return "";
+	return name.charAt(0).toUpperCase();
+};
+// 添加数字格式化函数
+const formatNumber = (num: number): string => {
+	return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 </script>
 
 <style scoped>
@@ -1431,9 +1402,9 @@ onShow(() => {
 				align-items: center;
 				gap: 34rpx;
 
-				.kf {
-					font-weight: b;
-				}
+				// .kf {
+				// 	font-weight: bold;
+				// }
 			}
 		}
 
@@ -1753,13 +1724,14 @@ onShow(() => {
 				position: fixed;
 				height: 70rpx;
 				display: flex;
+				top: 0;
 				flex-direction: column;
 				justify-content: center;
 				align-items: center;
 				text-align: center;
 				background-color: #f6f5fa;
 				z-index: 9;
-				padding-top: 20rpx;
+				// padding-top: 20rpx;
 				.t-all {
 					font-weight: 500;
 					color: #000;
@@ -1774,7 +1746,6 @@ onShow(() => {
 				flex-direction: column;
 				align-items: center;
 				padding-top: 200rpx;
-				// padding-bottom: 150rpx;
 				.list {
 					width: 100%;
 					display: flex;
@@ -1793,7 +1764,7 @@ onShow(() => {
 				.list-head {
 					height: 90rpx;
 					position: sticky;
-					top: 70rpx;
+					top: 68rpx;
 					z-index: 99;
 					background-color: #f6f5fa;
 					display: flex;
@@ -1804,7 +1775,7 @@ onShow(() => {
 					width: 100%;
 					transition: height 0.3s ease;
 					&.is_sticky {
-						height: 60rpx;
+						height: 80rpx;
 					}
 
 					.t {
@@ -2220,7 +2191,7 @@ onShow(() => {
 		will-change: transform;
 	}
 	.edit-content {
-		padding: 0 30rpx 140rpx 30rpx;
+		padding: 0 0 140rpx 0;
 		box-sizing: border-box;
 		width: 100%;
 		overflow: hidden;
@@ -2238,13 +2209,26 @@ onShow(() => {
 		}
 
 		.edit-item {
-			padding: 20rpx 0;
-			// border-bottom: 1rpx solid #cecccc;
+			padding: 20px 30rpx 20px 30rpx;
 			margin-bottom: 20rpx;
 			width: 100%;
+			border-bottom: 1rpx solid #dcdbdb;
 			.item {
-				height: 70rpx;
 				margin-bottom: 10rpx;
+				.item-title {
+					display: flex;
+					flex-direction: column;
+					padding: 10rpx 10rpx;
+					.item-title-text {
+						font-size: 28rpx;
+						font-weight: 700;
+					}
+				}
+				.new-img {
+					width: 200rpx;
+					height: 200rpx;
+					border-radius: 10rpx;
+				}
 			}
 		}
 	}
@@ -2254,32 +2238,13 @@ onShow(() => {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		padding: 30rpx;
+		padding: 20rpx 0;
 		display: flex;
 		justify-content: space-between;
 		flex-shrink: 0;
 		border-top: 1rpx solid #eee;
 		background: #fff;
 		z-index: 1;
-
-		.edit-btn {
-			width: 45%;
-			height: 80rpx;
-			line-height: 80rpx;
-			text-align: center;
-			border-radius: 40rpx;
-			font-size: 28rpx;
-
-			&.cancel {
-				background: #f5f5f5;
-				color: #666;
-			}
-
-			&.confirm {
-				background: #007aff;
-				color: #fff;
-			}
-		}
 	}
 }
 </style>

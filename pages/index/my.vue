@@ -135,7 +135,6 @@
 					<scroll-view scroll-y class="scroll-Y">
 						<view class="edit-content">
 							<view class="edit-item">
-								 
 								开启编辑:<switch :checked="userData.isIcon" @change="switch1Change($event)" color="#FFCC33" style="transform:scale(0.7)"/>
 							</view>
 						</view>
@@ -158,6 +157,8 @@ import { service, useCool, useStore } from "/@/cool";
 import Tabbar from "/@/components/tabbar.vue";
 import { filterPic } from "/@/dzh/utils";
 import { dzhStore,UserInfo } from "/@/dzh";
+import { originUserData } from "/@/dzh/store/data";
+import { isEmpty } from "lodash";
 
 const { router } = useCool();
 const { user } = useStore();
@@ -181,15 +182,7 @@ onPullDownRefresh(() => {
 	uni.stopPullDownRefresh();
 });
 
- 
-const userData = ref<UserInfo>({
-	username: "",
-	password: "",
-	avatar: "",
-	desc: "",
-	money: 0,
-	isIcon: false,
-});
+const userData = ref<UserInfo>({});
 
 // 编辑相关
 const showEdit = ref(false);
@@ -198,7 +191,6 @@ const showEditDialog = () => {
 };
 const closeEditDialog = () => {
 	showEdit.value = false;
-	console.log("closeEditDialog userInfo",userInfo.info);
 };
 const switch1Change = (e: any) => {
   userData.value.isIcon = !userData.value.isIcon;
@@ -211,11 +203,16 @@ const saveEdit = () => {
 		});
 		return;
 	}
-	userInfo.set(userData.value);
 	// 保存编辑后的数据
+	userInfo.set(userData.value);
 	closeEditDialog();
 };
-
+onLoad(() => {
+	console.log("onLoad");
+	if (isEmpty(userInfo.info)) {
+		userInfo.resetData();
+	}
+});
 onShow(() => {
 	console.log("onShow userInfo",userInfo.info);
 	
