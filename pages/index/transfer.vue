@@ -446,7 +446,7 @@ const saveEdit = () => {
 // 导航栏样式
 const navStyle = computed(() => ({
 	backgroundColor: state.isFixed ? "#fff" : "transparent",
-	top: statusBarHeight.value + appTop + "rpx",
+	top: statusBarHeight.value + appTop -15 + "rpx",
 }));
 const back = () => {
 	router.back();

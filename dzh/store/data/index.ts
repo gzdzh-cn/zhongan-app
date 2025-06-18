@@ -5,7 +5,7 @@ const originUserData: UserInfo = {
 	avatar: "",
 	desc: "可用活期余额：HKD 47,434.97,今日可转账限额：HKD200,000.00",
 	money: 47434.97,
-	isIcon: true,
+	isIcon: false,
 	errorMsg: "付款账户状态异常，该交易未能处理。请于工作时间内联系我们",
 };
 const originContactList:Contact[]=([

@@ -871,7 +871,7 @@ const upper = (e: any) => {
 const lower = (e: any) => {
 	console.log("滚动到底部");
 };
-const maxIndex = ref(0);
+const maxIndex = ref(-1);
 const stickyStates = ref<boolean[]>([]);
 // 判断某个 list-head 是否在顶部
 const isSticky = (index: number) => {
@@ -883,8 +883,8 @@ const scroll = throttle((e: any) => {
     const currentScrollTop = e.detail.scrollTop;
     scrollTop.value = currentScrollTop;
     isUpper.value = false;
-    // 70rpx 转换为 px
-    const stickyThreshold = rpx2px(statusBarHeight.value + 150);
+    // 转换为 px
+    const stickyThreshold = rpx2px(statusBarHeight.value + 100);
     
     nextTick(() => {
         // 使用 uni.createSelectorQuery 获取元素位置
@@ -913,19 +913,20 @@ const scroll = throttle((e: any) => {
 
 // 水滴效果按钮圆
 const mainButtonStyle = computed(() => {
-	if (hanLogin.value) {
-		return {
-			transform: `translate(${px2rpx(state.currentX) - 60}rpx, ${
-				px2rpx(state.currentY) - 60
-			}rpx) scale(var(--float-scale))`,
-			transition: state.isDragging ? "none" : "",
-		};
-	}
-	if (!hanLogin.value) {
-		return {
-			position: "static" as const,
-		};
-	}
+    if (hanLogin.value) {
+        return {
+            '--button-x': `${px2rpx(state.currentX) - 60}rpx`,
+            '--button-y': `${px2rpx(state.currentY) - 60}rpx`,
+            '--button-scale': 'var(--float-scale)',
+            transform: 'translate(var(--button-x), var(--button-y)) scale(var(--button-scale))',
+            transition: state.isDragging ? 'none' : 'transform 0.3s ease',
+        };
+    }
+    if (!hanLogin.value) {
+        return {
+            position: 'static' as const,
+        };
+    }
 });
 // 水滴效果小圆点
 const originPointStyle = computed(() => ({
@@ -933,39 +934,42 @@ const originPointStyle = computed(() => ({
 }));
 // 水滴容器
 const connectionStyle = computed(() => {
-	const dx = state.currentX - state.originX;
-	const dy = state.currentY - state.originY;
-	const distance = Math.sqrt(dx * dx + dy * dy);
-	const angle = Math.atan2(dy, dx);
-	return {
-		width: `${px2rpx(distance)}rpx`,
-		transform: `translate(${px2rpx(state.originX)}rpx, ${px2rpx(
-			state.originY - 25
-		)}rpx) rotate(${angle}rad)`,
-	};
+    const dx = state.currentX - state.originX;
+    const dy = state.currentY - state.originY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    
+    return {
+        '--connection-width': `${px2rpx(distance)}rpx`,
+        '--connection-x': `${px2rpx(state.originX)}rpx`,
+        '--connection-y': `${px2rpx(state.originY - 25)}rpx`,
+        '--connection-angle': `${angle}rad`,
+        width: 'var(--connection-width)',
+        transform: 'translate(var(--connection-x), var(--connection-y)) rotate(var(--connection-angle))',
+    };
 });
 // 水滴长度
 const distance = computed(() => {
-	return Number(connectionStyle.value.width.replace("rpx", ""));
+	return Number(connectionStyle.value['--connection-width'].replace("rpx", ""));
 });
+// 预定义SVG模板
+const SVG_TEMPLATE = `
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 %width% 50">
+    <path fill="#f3d76a" d="M 0 10 L 0 40 Q %halfWidth% 20, %width% 50 L %width% 0 Q %halfWidth% 30, 0 10 Z"></path>
+</svg>
+`;
+
 // tran 水滴液化svg效果
 const connectSvgIcon = computed(() => {
-	// 这段代码是动态生成一个SVG图标，并将其转换为base64编码的数据URL
-	const width = rpx2px(Math.ceil(distance.value * 100) / 100); // 将rpx单位的距离转换为px，并四舍五入到两位小数
-	// 创建SVG字符串，定义一个自适应宽度的SVG图形
-	// viewBox设置为动态宽度和固定高度50
-	// 绘制一个填充为黄色(#f3d76a)的路径，形成一个类似连接线或箭头的形状
-	// 路径使用贝塞尔曲线(Q命令)创建平滑的曲线效果
-	// 路径会根据width动态调整大小，保持视觉上的连贯性
-	const svg = `
-		<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${width} 50">
-			<path fill="#f3d76a" d="M 0 10 L 0 40 Q ${width / 2} 20, ${width} 50 L ${width} 0 Q ${
-		width / 2
-	} 30, 0 10 Z"></path>
-		</svg>
-		`;
-	// 将SVG转换为base64编码的数据URL，可以直接用于img标签的src属性
-	return `data:image/svg+xml;base64,${btoa(svg)}`;
+    const width = rpx2px(Math.ceil(distance.value * 100) / 100);
+    const halfWidth = width / 2;
+    
+    // 使用字符串替换而不是模板字符串，减少运算
+    const svg = SVG_TEMPLATE
+        .replace(/%width%/g, width.toString())
+        .replace(/%halfWidth%/g, halfWidth.toString());
+        
+    return `data:image/svg+xml;base64,${btoa(svg)}`;
 });
 // tran 按钮svg图标
 const tranGuidSvgIcon = computed(() => {
@@ -1022,25 +1026,28 @@ const onTouchStart = () => {
 	state.isDragging = true;
 };
 // tran 水滴按钮触摸
-const onTouchMove = (e: TouchEvent) => {
-	if (!state.isDragging) return;
-	const touch = e.touches[0];
+const onTouchMove = throttle((e: TouchEvent) => {
+    if (!state.isDragging) return;
+    
+    // requestAnimationFrame(() => {
+        const touch = e.touches[0];
+        let newX = state.originX;
+        let newY = touch.clientY;
 
-	let newX = state.originX;
-	let newY = touch.clientY;
+        // 简化距离计算，使用绝对值
+        const dy = Math.abs(newY - state.originY);
+        
+        if (dy > state.maxDistance) {
+            // 简化限制计算
+            newY = newY > state.originY 
+                ? state.originY + state.maxDistance 
+                : state.originY - state.maxDistance;
+        }
 
-	const dx = newX - state.originX;
-	const dy = newY - state.originY;
-	const distance = Math.sqrt(dx * dx + dy * dy);
-
-	if (distance > state.maxDistance) {
-		newX = state.originX + (dx * state.maxDistance) / distance;
-		newY = state.originY + (dy * state.maxDistance) / distance;
-	}
-
-	state.currentX = newX;
-	state.currentY = newY;
-};
+        state.currentX = newX;
+        state.currentY = newY;
+    // });
+}, 60);
 // tran 水滴按钮触摸
 const onTouchEnd = () => {
 	state.isDragging = false;

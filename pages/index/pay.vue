@@ -164,6 +164,7 @@
 					<span class="dot tail8"></span>
 				</div>
 			</view>
+			<u-toast ref="uToastRef" />
 		</view>
 	</cl-page>
 </template>
@@ -194,7 +195,7 @@ const { userInfo, tranInfo } = dzhStore();
 const uToastRef = ref();
 const mcs = ref({ background: "rgba(0, 0, 0, 0.2)" });
 const navStyle = computed(() => ({
-	top: statusBarHeight.value + appTop + "rpx",
+	top: statusBarHeight.value + appTop -15 + "rpx",
 }));
 
 const formData = reactive<FormData>({
@@ -206,17 +207,7 @@ const userData = ref<UserInfo>({
 	desc: userInfo.info.desc,
 });
 
-const contact = ref<Contact>({
-	name: "",
-	phoneNumber: "",
-	letter: "",
-	receiveBankName: "",
-	type: "",
-	colorNum: 0,
-	sort: 0,
-	isTop: false,
-	receiveBankAccount: "",
-});
+const contact = ref<Contact>({});
 const popupPayAShow = ref(false);
 const loading = ref(false);
 
@@ -280,6 +271,7 @@ const handleTouchEnd = () => {
 		uToastRef.value.show({
 			title: "请输入金额",
 			type: "warning",
+			position: "bottom",
 		});
 		return;
 	}
@@ -362,6 +354,7 @@ onShow(() => {
 	const id = Number(props.id);
 	contact.value = tranInfo.info.find((item: Contact) => item.id == id);
 	console.log("contact", contact.value);
+	console.log("userData", userData.value);
 });
 onLoad((options: any) => {});
 </script>

@@ -58,7 +58,7 @@
 
 					<view class="t-box">
 						<text class="t1"> 交易失败 </text>
-						<text class="t2">付款账户状态异常，该交易未能处理。请于工作时间内联系我们</text>
+						<text class="t2">{{ userData?.errorMsg }}</text>
 					</view>
 				</view>
 
@@ -75,7 +75,7 @@
 import { computed, reactive, ref, onMounted } from "vue";
 import { useCool } from "/@/cool";
 import { onShow } from "@dcloudio/uni-app";
-import { dzhStore, Contact } from "/@/dzh";
+import { dzhStore, Contact, UserInfo } from "/@/dzh";
 
 
 
@@ -87,17 +87,12 @@ interface Props {
  
 const props = defineProps<Props>();
 
-const contact = ref<Contact>({
-	name: "",
-	phoneNumber: "",
-	letter: "",
-	receiveBankName: "",
-	type: "",
-	colorNum: 0,
-	sort: 0,
-	isTop: false,
-	receiveBankAccount: ""
+const userData = ref<UserInfo>({
+	username: userInfo.info.username,
+	desc: userInfo.info.desc,
+	errorMsg: userInfo.info.errorMsg,
 });
+const contact = ref<Contact>({});
 const sectionShow = ref(1);
 const iconShow = ref(1);
 
@@ -123,6 +118,8 @@ onShow(()=>{
 	const id = Number(props.id);
 	contact.value = tranInfo.info.find((item: Contact) => item.id == id);
 	console.log("contact", contact.value);
+	// userData.value.desc = userInfo.info.desc;
+	console.log("userData", userData.value);
 })
 
 </script>
