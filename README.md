@@ -1,6 +1,6 @@
 # 高防众安 app
 ## 技术栈
-项目采用 Uniapp+Vue3.0+vkuview
+项目采用 Uniapp + Vue3.0 + vk-uview
  
 ![image](./template.png)
 
