@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "9098665",
+      "name": "铃",
+      "font_class": "ling",
+      "unicode": "e657",
+      "unicode_decimal": 58967
+    },
+    {
+      "icon_id": "16372289",
+      "name": "铃铛",
+      "font_class": "lingdang",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
+      "icon_id": "14918514",
+      "name": "双箭头",
+      "font_class": "jiantouyou",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
       "icon_id": "6184963",
       "name": "账户管理",
       "font_class": "zhanghuguanli",

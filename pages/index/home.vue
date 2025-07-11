@@ -36,6 +36,22 @@
 						</view>
 					</view>
 
+					<!-- 通告栏 -->
+					<view class="notice-bar">
+					 
+							<uni-icons
+								custom-prefix="iconfont-3156"
+								type="icon-ling"
+								size="19"
+								color="#dd9734"
+								class="icon-ling"
+							></uni-icons>
+							<text class="notice-bar-text">
+								账户状态异常，请留意查收我们发出的通知
+							</text>
+					 
+					</view>
+
 					<!-- 余额 -->
 					<view class="hd">
 						<view class="card left">
@@ -1427,6 +1443,25 @@ const formatNumber = (num: number): string => {
 				// .kf {
 				// 	font-weight: bold;
 				// }
+			}
+		}
+
+		.notice-bar {
+			width: 100%;
+			height: 70rpx;
+			background-color: #fbede5;
+			border-radius: 25rpx;
+			padding: 0 20rpx;
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-start;
+			align-items: center;
+			
+			.notice-bar-text{
+				font-size: 26rpx;
+				color: #dc9c43;
+				font-weight: 400;
+				margin-left: 10rpx;
 			}
 		}
 
