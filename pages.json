@@ -6,53 +6,64 @@
 			"style": {
 				"navigationBarTitleText": "首页",
 				"enablePullDownRefresh": false,
-				"navigationStyle":"custom"
-				 
+				"navigationStyle": "custom"
+
 			}
 		},
 		{
 			"path": "pages/index/my",
 			"style": {
 				"navigationBarTitleText": "我的",
-				"navigationStyle":"custom"
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path" : "pages/index/transfer",
-			"style" : 
-			{
-				"navigationBarTitleText" : "转账",
-				"navigationStyle":"custom"
+			"path": "pages/index/transfer",
+			"style": {
+				"navigationBarTitleText": "转账",
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path" : "pages/index/pay",
-			"style" : 
-			{
-				"navigationBarTitleText" : "支付",
-				"navigationStyle":"custom"
+			"path": "pages/index/pay",
+			"style": {
+				"navigationBarTitleText": "支付",
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path" : "pages/index/tranAfter",
-			"style" : 
-			{
-				"navigationBarTitleText" : "转账中",
-				"navigationStyle":"custom"
+			"path": "pages/index/tranAfter",
+			"style": {
+				"navigationBarTitleText": "转账中",
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path" : "pages/index/tansou",
-			"style" : 
-			{
-				"navigationBarTitleText" : "探索"
+			"path": "pages/index/tansou",
+			"style": {
+				"navigationBarTitleText": "探索"
 			}
 		},
 		{
-			"path" : "pages/index/touzi",
-			"style" : 
-			{
-				"navigationBarTitleText" : "投资"
+			"path": "pages/index/touzi",
+			"style": {
+				"navigationBarTitleText": "投资"
+			}
+		},
+		{
+			"path": "uni_modules/uni-upgrade-center-app/pages/upgrade-popup",
+			"style": {
+				"disableScroll": true,
+				"app-plus": {
+					"backgroundColorTop": "transparent",
+					"background": "transparent",
+					"titleNView": false,
+					"scrollIndicator": false,
+					"popGesture": "none",
+					"animationType": "fade-in",
+					"animationDuration": 200
+
+				}
 			}
 		}
 
@@ -72,7 +83,7 @@
 					"path": "set",
 					"style": {
 						"navigationBarTitleText": "设置",
-						"navigationStyle":"custom"
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -122,27 +133,24 @@
 					}
 				},
 				{
-					"path" : "info",
-					"style" : 
-					{
-						"navigationBarTitleText" : "资料卡",
-						"enablePullDownRefresh" : false
+					"path": "info",
+					"style": {
+						"navigationBarTitleText": "资料卡",
+						"enablePullDownRefresh": false
 					}
 				},
 				{
-					"path" : "userDescribe",
-					"style" : 
-					{
-						"navigationBarTitleText" : "会员权益",
-						"enablePullDownRefresh" : false
+					"path": "userDescribe",
+					"style": {
+						"navigationBarTitleText": "会员权益",
+						"enablePullDownRefresh": false
 					}
 				},
 				{
-					"path" : "policy",
-					"style" : 
-					{
-						"navigationBarTitleText" : "隐私政策",
-						"enablePullDownRefresh" : false
+					"path": "policy",
+					"style": {
+						"navigationBarTitleText": "隐私政策",
+						"enablePullDownRefresh": false
 					}
 				}
 			]
@@ -168,8 +176,7 @@
 		"selectedColor": "#3cc51f",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
-		"list": [
-			{
+		"list": [{
 				"pagePath": "pages/index/home",
 				"iconPath": "static/3156/img/icon2.png",
 				"selectedIconPath": "static/3156/img/icon2.png",

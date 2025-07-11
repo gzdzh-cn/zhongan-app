@@ -555,11 +555,11 @@ onLoad((options: any) => {});
 				width: 40rpx;
 				height: 40rpx;
 			}
-			::v-deep .uni-easyinput__content-input {
+			:deep(.uni-easyinput__content-input) {
 				font-size: 60rpx;
 				font-weight: bold;
 			}
-			::v-deep .uni-easyinput__placeholder-class {
+			:deep(.uni-easyinput__placeholder-class) {
 				font-size: 60rpx;
 			}
 		}
@@ -612,7 +612,7 @@ onLoad((options: any) => {});
 			.text {
 				font-size: 30rpx;
 			}
-			::v-deep .uni-easyinput__content-input {
+			:deep(.uni-easyinput__content-input) {
 				font-size: 30rpx;
 				color: #c3c2c2;
 				text-align: right;
@@ -684,7 +684,7 @@ onLoad((options: any) => {});
 			}
 		}
 	}
-	::v-deep .uni-easyinput__placeholder-class {
+	:deep(.uni-easyinput__placeholder-class) {
 		font-size: 28rpx;
 	}
 	.p-box {

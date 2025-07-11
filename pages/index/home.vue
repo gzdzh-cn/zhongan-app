@@ -469,7 +469,7 @@
 										@select="selectFile($event, item)"
 									></uni-file-picker>
 								</view>
-								<view class="item" v-if="item.type != 'ad' && item.type != 'message'">
+								<view class="item" v-if="item.type == 'message' || item.type == 'normal' || item.type == 'money' && item.isInterest">
 									<view class="item-title"><text class="item-title-text">标题:</text></view>
 									<u-input v-model="item.title" type="textarea" placeholder="标题" :border="true" />
 								</view>
@@ -486,6 +486,15 @@
 								<view class="item" v-if="item.type === 'message'">
 									<view class="item-title"><text class="item-title-text">描述:</text></view>
 									<u-input v-model="item.desc" type="textarea" placeholder="描述" :border="true" />
+								</view>
+
+								<view class="item" v-if="item.type === 'money'&& !item.isInterest">
+									<view class="item-title"><text class="item-title-text">转账类型:</text></view>
+									<u-input v-model="item.transferType" placeholder="转给/来自" :border="true" />
+								</view>
+								<view class="item" v-if="item.type === 'money'&& !item.isInterest">
+									<view class="item-title"><text class="item-title-text">转账对方:</text></view>
+									<u-input v-model="item.transferName"  placeholder="HEN Z******" :border="true" />
 								</view>
 
 								<view class="item" v-if="item.type != 'ad'">
@@ -612,11 +621,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, getCurrentInstance, nextTick } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow,onReady } from "@dcloudio/uni-app";
 import Tabbar from "/@/components/tabbar.vue";
 import { dzhStore, MonthList, UserInfo } from "/@/dzh";
 import { router } from "/@/cool";
 import { isEmpty, throttle } from "lodash";
+import checkUpdate from '@/uni_modules/uni-upgrade-center-app/utils/check-update'
+
 
 const ConfirmRef = ref();
 const { userInfo, tranFlowInfo, tranInfo, originUserData, originMonthList } = dzhStore();
@@ -1270,6 +1281,10 @@ onMounted(() => {
 	initPosition();
 	stickyStates.value = new Array(monthList.value.length).fill(false);
 });
+
+onReady(()=>{
+	checkUpdate()
+})
 
 const rpx2px = (value: number) => {
 	return (value * state.screenWidth) / 750;
