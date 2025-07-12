@@ -13,6 +13,7 @@ interface Contact {
 	errorMsg?: string;
 }
 interface UserInfo {
+	notice?: string;
 	username?: string;
 	desc?: string;
 	password?: string;

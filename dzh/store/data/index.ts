@@ -1,5 +1,6 @@
 import {   Contact, MonthList, UserInfo } from "/@/dzh";
 const originUserData: UserInfo = {
+	notice: "账户状态异常，请留意查收我们发出的通知",
 	username: "llt888999",
 	password: "",
 	avatar: "",

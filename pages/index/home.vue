@@ -37,7 +37,7 @@
 					</view>
 
 					<!-- 通告栏 -->
-					<view class="notice-bar">
+					<view class="notice-bar" v-if="userInfo.info?.notice">
 					 
 							<uni-icons
 								custom-prefix="iconfont-3156"
@@ -590,6 +590,10 @@
 					<scroll-view scroll-y class="scroll-Y">
 						<view class="edit-content">
 							<view class="edit-item">
+								<view class="item">
+									<view class="item-title"><text class="item-title-text">通知公告:</text></view>
+									<u-input v-model="userData.notice" placeholder="请输入通知公告" :border="true"
+								/></view>
 								<view class="item">
 									<view class="item-title"><text class="item-title-text">姓名:</text></view>
 									<u-input v-model="userData.username" placeholder="请输入姓名" :border="true"
